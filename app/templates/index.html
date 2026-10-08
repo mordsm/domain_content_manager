@@ -1,0 +1,1004 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Domain Content Manager | מנהל תוכן רב-תחומי</title>
+    <link rel="manifest" href="/manifest.json">
+    <style>
+        * { box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background: #090d16;
+            color: #f8fafc;
+            min-height: 100vh;
+        }
+        .navbar {
+            background: #0f172a;
+            border-bottom: 1px solid #1e293b;
+            padding: 1rem 2rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 1.25rem;
+            font-weight: 800;
+            color: #38bdf8;
+        }
+        .brand-icon {
+            background: linear-gradient(135deg, #0284c7, #22c55e);
+            width: 42px;
+            height: 42px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #fff;
+            font-size: 1.3rem;
+            box-shadow: 0 0 12px rgba(2, 132, 199, 0.4);
+        }
+        .nav-links a {
+            color: #38bdf8;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 0.9rem;
+            margin-left: 15px;
+            transition: color 0.2s;
+        }
+        .nav-links a:hover { color: #7dd3fc; }
+
+        .container {
+            max-width: 1440px;
+            margin: 0 auto;
+            padding: 2rem;
+            display: grid;
+            grid-template-columns: 380px 1fr;
+            gap: 2rem;
+        }
+        @media (max-width: 992px) {
+            .container { grid-template-columns: 1fr; }
+        }
+        .panel {
+            background: #0f172a;
+            border: 1px solid #1e293b;
+            border-radius: 14px;
+            padding: 1.5rem;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+        }
+        .panel-title {
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: #38bdf8;
+            margin-top: 0;
+            margin-bottom: 1rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 1px solid #1e293b;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        .form-group {
+            margin-bottom: 1.25rem;
+        }
+        .form-group label {
+            display: block;
+            font-size: 0.85rem;
+            color: #94a3b8;
+            margin-bottom: 6px;
+            font-weight: 600;
+        }
+        .form-control {
+            width: 100%;
+            background: #1e293b;
+            border: 1px solid #334155;
+            color: #fff;
+            padding: 10px 12px;
+            border-radius: 8px;
+            font-size: 0.95rem;
+        }
+        .btn {
+            background: #0284c7;
+            color: #fff;
+            border: none;
+            padding: 10px 18px;
+            border-radius: 8px;
+            font-weight: 700;
+            cursor: pointer;
+            width: 100%;
+            transition: all 0.2s;
+        }
+        .btn:hover { background: #0369a1; }
+        .btn-voice {
+            background: linear-gradient(135deg, #10b981, #059669);
+            margin-top: 8px;
+        }
+        .btn-voice:hover { background: #047857; }
+        .btn-record {
+            background: linear-gradient(135deg, #ef4444, #dc2626);
+            margin-top: 8px;
+        }
+        .btn-ask {
+            background: linear-gradient(135deg, #0284c7, #3b82f6);
+            margin-top: 8px;
+        }
+        .btn-build {
+            background: linear-gradient(135deg, #a855f7, #7e22ce);
+            margin-top: 10px;
+        }
+        .btn-build:hover { background: #6b21a8; }
+        .btn-detail {
+            background: rgba(56, 189, 248, 0.12);
+            color: #38bdf8;
+            border: 1px solid rgba(56, 189, 248, 0.3);
+            padding: 6px 14px;
+            border-radius: 6px;
+            font-size: 0.82rem;
+            font-weight: 700;
+            cursor: pointer;
+            margin-top: 10px;
+            transition: all 0.2s;
+            display: inline-block;
+        }
+        .btn-detail:hover { background: #0284c7; color: #fff; }
+
+        .domain-tabs {
+            display: flex;
+            gap: 8px;
+            overflow-x: auto;
+            padding-bottom: 1rem;
+            margin-bottom: 1.5rem;
+            border-bottom: 1px solid #1e293b;
+        }
+        .tab-btn {
+            background: #1e293b;
+            border: 1px solid #334155;
+            color: #cbd5e1;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            cursor: pointer;
+            white-space: nowrap;
+            transition: all 0.2s;
+        }
+        .tab-btn:hover, .tab-btn.active {
+            background: #0284c7;
+            color: #fff;
+            border-color: #38bdf8;
+        }
+
+        .record-card {
+            background: #1e293b;
+            border: 1px solid #334155;
+            border-radius: 12px;
+            padding: 1.25rem;
+            margin-bottom: 1.25rem;
+            transition: all 0.2s;
+            cursor: pointer;
+            position: relative;
+        }
+        .record-card:hover { border-color: #0284c7; box-shadow: 0 4px 15px rgba(2, 132, 199, 0.25); transform: translateY(-1px); }
+
+        .card-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 10px;
+        }
+        .card-title-box {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .card-title {
+            font-size: 1.15rem;
+            font-weight: 700;
+            color: #38bdf8;
+            margin: 0;
+        }
+
+        .badge {
+            padding: 4px 10px;
+            border-radius: 6px;
+            font-size: 0.78rem;
+            font-weight: 700;
+        }
+        .badge-culinary { background: rgba(245, 158, 11, 0.2); color: #fbbf24; border: 1px solid #f59e0b; }
+        .badge-health { background: rgba(16, 185, 129, 0.2); color: #34d399; border: 1px solid #10b981; }
+        .badge-hair { background: rgba(236, 72, 153, 0.2); color: #f472b6; border: 1px solid #ec4899; }
+        .badge-diet { background: rgba(59, 130, 246, 0.2); color: #60a5fa; border: 1px solid #3b82f6; }
+        .badge-garden { background: rgba(34, 197, 94, 0.2); color: #4ade80; border: 1px solid #22c55e; }
+        .badge-foraging { background: rgba(168, 85, 247, 0.2); color: #c084fc; border: 1px solid #a855f7; }
+        .badge-mental { background: rgba(139, 92, 246, 0.2); color: #a78bfa; border: 1px solid #8b5cf6; }
+        .badge-financial { background: rgba(16, 185, 129, 0.2); color: #34d399; border: 1px solid #10b981; }
+        .badge-general { background: rgba(148, 163, 184, 0.2); color: #cbd5e1; border: 1px solid #94a3b8; }
+
+        .risk-banner {
+            background: rgba(239, 68, 68, 0.15);
+            border: 1px solid #ef4444;
+            color: #fca5a5;
+            padding: 8px 12px;
+            border-radius: 8px;
+            font-size: 0.85rem;
+            margin-bottom: 10px;
+        }
+
+        .domain-meta-box {
+            background: #0f172a;
+            border: 1px solid #334155;
+            border-radius: 8px;
+            padding: 10px 14px;
+            margin-top: 10px;
+            font-size: 0.88rem;
+            color: #cbd5e1;
+        }
+
+        .collapsible-body {
+            display: none;
+            margin-top: 12px;
+            padding-top: 12px;
+            border-top: 1px solid #334155;
+            background: #090d16;
+            padding: 12px;
+            border-radius: 8px;
+        }
+        .collapsible-body.open { display: block; }
+
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: rgba(0, 0, 0, 0.85);
+            z-index: 2000;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            padding: 1.5rem;
+        }
+        .modal-overlay.active { display: flex; }
+        .modal-card {
+            background: #0f172a;
+            border: 1px solid #0284c7;
+            border-radius: 14px;
+            width: 100%;
+            max-width: 800px;
+            max-height: 90vh;
+            overflow-y: auto;
+            padding: 2rem;
+            box-shadow: 0 10px 30px rgba(2, 132, 199, 0.4);
+            position: relative;
+        }
+        .modal-close {
+            position: absolute;
+            top: 15px;
+            left: 15px;
+            background: #334155;
+            color: #fff;
+            border: none;
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 1.2rem;
+        }
+        .modal-close:hover { background: #ef4444; }
+
+        .output-modal {
+            background: rgba(15, 23, 42, 0.95);
+            border: 1px solid #a855f7;
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-top: 1.5rem;
+            display: none;
+        }
+        .ask-answer-box {
+            background: #020617;
+            border: 1px solid #38bdf8;
+            border-radius: 10px;
+            padding: 1.25rem;
+            margin-top: 1rem;
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <div class="brand">
+            <div class="brand-icon">🎙️</div>
+            <div>Domain Content Manager</div>
+        </div>
+        <div class="nav-links">
+            <a href="/vault/" target="_blank">📂 Obsidian Vault</a>
+            <a href="/docs" target="_blank">⚡ Swagger API Docs</a>
+        </div>
+    </nav>
+
+    <div class="container">
+        <!-- CAPTURE & CONTROL PANEL -->
+        <aside class="panel">
+            <h3 class="panel-title"><span>📥 קליטה מהירה (Capture)</span></h3>
+            <form id="captureForm">
+                <div class="form-group">
+                    <label>כותרת / נושא</label>
+                    <input type="text" id="capTitle" class="form-control" placeholder="למשל: סרטון טיפים ליצירת תמונות ב-Midjourney">
+                </div>
+                <div class="form-group">
+                    <label>🔗 קישור / URL (אופציונלי - YouTube / Vimeo / MP4)</label>
+                    <input type="url" id="capSourceUrl" class="form-control" placeholder="https://youtube.com/watch?v=..." oninput="autoDetectSourceType()">
+                </div>
+                <div class="form-group">
+                    <label>סוג מקור</label>
+                    <select id="capSourceType" class="form-control">
+                        <option value="note">📝 הערה / טקסט חופשי</option>
+                        <option value="video">🎥 סרטון וידאו (Video)</option>
+                        <option value="podcast">🎙️ פודקאסט (Podcast)</option>
+                        <option value="article">📰 מאמר (Article)</option>
+                        <option value="infographic">📊 אינפוגרפיקה (Infographic)</option>
+                    </select>
+                </div>
+                <div class="form-group" style="background: rgba(2, 132, 199, 0.12); border: 2px dashed #38bdf8; padding: 15px; border-radius: 12px; text-align: center; margin-bottom: 1.25rem;">
+                    <label style="font-size: 1.05rem; color: #38bdf8; font-weight: 700; display: block; margin-bottom: 8px;">
+                        📂 העלאת אינפוגרפיקות מהמחשב (ניתן לבחור מספר קבצי JPEG / PNG פעם אחת)
+                    </label>
+                    <input type="file" id="capFile" class="form-control" accept="image/jpeg,image/jpg,image/png,image/webp,image/gif" multiple onchange="autoSelectInfographic()" style="background: #0f172a; border: 1px solid #0284c7; color: #fff; padding: 10px; font-size: 0.95rem; cursor: pointer;">
+                    <span style="color: #cbd5e1; font-size: 0.82rem; display: block; margin-top: 6px;">💡 ניתן לבחור מספר קבצי תמונה יחד (במקביל) לפריט אינפוגרפיקה אחד!</span>
+                    <span id="fileCountNotice" style="display:none; color:#10b981; font-weight:700; font-size:0.9rem; margin-top:8px;"></span>
+                </div>
+                <div class="form-group">
+                    <label>תוכן / הערות / תמליל</label>
+                    <textarea id="capText" class="form-control" rows="4" placeholder="הכנס טקסט, תמצית או הדבק קישור לסרטון..." oninput="autoDetectSourceType()"></textarea>
+                </div>
+                <div class="form-group">
+                    <label>תחום ראשי (מתוך config/domains.yaml)</label>
+                    <select id="capDomain" class="form-control" onchange="renderSubTopicsForm()">
+                        <!-- Dynamically populated from domains.yaml -->
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>תחומים מרובים (Multi-Domain Tags)</label>
+                    <div id="capDomainsList" style="display:flex; flex-wrap:wrap; gap:8px; background:#1e293b; padding:10px; border-radius:8px; border:1px solid #334155;">
+                        <!-- Dynamically populated from domains.yaml -->
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>תתי-נושאים (Sub-Topics מתוך config/domains.yaml)</label>
+                    <div id="capSubTopicsList" style="display:flex; flex-wrap:wrap; gap:8px; background:#1e293b; padding:10px; border-radius:8px; border:1px solid #334155;">
+                        <!-- Dynamically populated from domains.yaml -->
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>🏷️ תגים אישיים משלי (הפרד בפסיקים)</label>
+                    <input type="text" id="capCustomTags" class="form-control" placeholder="למשל: מומלץ_אישית, ניסוי_אביב, דחוף">
+                </div>
+                <button type="submit" class="btn">💾 שמור רשומה ב-DB & Vault</button>
+            </form>
+
+            <hr style="border-color:#1e293b; margin:1.5rem 0;">
+
+            <h3 class="panel-title"><span>💬 שאל את המאגר (Ask KB)</span></h3>
+            <div class="form-group">
+                <input type="text" id="askQuestion" class="form-control" placeholder="למשל: איזה שמן עוזר לנשירת שיער?">
+            </div>
+            <button onclick="handleAskKB()" class="btn btn-ask">🔍 שאל וקבל תשובה עם ציטוטים</button>
+
+            <div class="ask-answer-box" id="askAnswerBox">
+                <h4 style="color:#38bdf8; margin-top:0;" id="askQuestionTitle"></h4>
+                <div style="font-size:0.95rem; color:#e2e8f0; line-height:1.6; white-space:pre-wrap;" id="askAnswerText"></div>
+                <div style="margin-top:10px; font-size:0.85rem; color:#34d399;" id="askVoiceScript"></div>
+            </div>
+
+            <hr style="border-color:#1e293b; margin:1.5rem 0;">
+
+            <h3 class="panel-title"><span>🗣️ קליטה קולית (Voice Capture)</span></h3>
+            <div class="form-group">
+                <input type="text" id="voiceInput" class="form-control" placeholder="הקלד תמליל קולי חופשי...">
+            </div>
+            <button onclick="handleVoiceCapture()" class="btn btn-voice">🎙️ נקוד בקול / שלח תמליל</button>
+
+            <hr style="border-color:#1e293b; margin:1.5rem 0;">
+
+            <h3 class="panel-title"><span>🔨 הרכבת תוצר (Output Builder)</span></h3>
+            <div class="form-group">
+                <label>סוג התוצר</label>
+                <select id="outType" class="form-control">
+                    <option value="post">פוסט לבלוג/רשתות (Post)</option>
+                    <option value="guide">מדריך מעשי (Guide)</option>
+                    <option value="protocol">פרוטוקול קליני/טיפולי (Protocol)</option>
+                    <option value="lecture">הרצאה/מצגת (Lecture)</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label>כותרת התוצר</label>
+                <input type="text" id="outTitle" class="form-control" placeholder="למשל: מדריך בריאות המעי והשיער">
+            </div>
+            <button onclick="handleBuildOutput()" class="btn btn-build">🚀 הרכב תוצר מנבחרים (<span id="selectedCount">0</span>)</button>
+        </aside>
+
+        <!-- CONTENT LISTING & RETRIEVAL PANEL -->
+        <main class="panel">
+            <h3 class="panel-title">
+                <span>📚 מאגר התכנים, השדות הדינמיים והקשרים</span>
+                <span style="font-size:0.8rem; color:#94a3b8;" id="totalRecordsBadge"></span>
+            </h3>
+            
+            <div class="domain-tabs">
+                <button class="tab-btn active" onclick="filterDomain('all', this)">🌐 הכל</button>
+                <button class="tab-btn" onclick="filterDomain('culinary', this)">🍳 קולינריה</button>
+                <button class="tab-btn" onclick="filterDomain('health', this)">🩺 בריאות</button>
+                <button class="tab-btn" onclick="filterDomain('diet', this)">🥗 דיאטה</button>
+                <button class="tab-btn" onclick="filterDomain('garden', this)">🌱 גינון</button>
+                <button class="tab-btn" onclick="filterDomain('foraging', this)">🍄 ליקוט</button>
+                <button class="tab-btn" onclick="filterDomain('mental', this)">🧠 מנטלי</button>
+                <button class="tab-btn" onclick="filterDomain('financial', this)">💰 כלכלי</button>
+            </div>
+
+            <!-- SUB-TOPICS FILTER BAR -->
+            <div id="subTopicFilterContainer" style="margin-bottom:1.5rem; background:#0f172a; border:1px solid #1e293b; border-radius:12px; padding:12px 16px;">
+                <div style="font-size:0.85rem; color:#94a3b8; font-weight:700; margin-bottom:8px; display:flex; align-items:center; gap:6px;">
+                    <span>📌 סינון תצוגה לפי תת-נושא (Sub-Topic):</span>
+                    <span id="activeSubTopicLabel" style="color:#38bdf8; font-weight:600;">(הכל)</span>
+                </div>
+                <div id="subTopicFilterButtons" style="display:flex; gap:6px; flex-wrap:wrap; align-items:center;">
+                    <!-- Dynamically rendered sub-topic filter pills -->
+                </div>
+            </div>
+
+            <div id="recordsContainer">
+                <p style="color:#94a3b8;">טוען תכנים מתוך המאגר...</p>
+            </div>
+
+            <!-- GENERATED OUTPUT DISPLAY -->
+            <div class="output-modal" id="outputResultModal">
+                <h4 style="color:#c084fc; margin-top:0;">🎉 התוצר הרכיב בהצלחה וסונכרן ל-Obsidian Vault!</h4>
+                <div style="background:#020617; padding:1rem; border-radius:8px; font-family:monospace; font-size:0.9rem; color:#e2e8f0; white-space:pre-wrap;" id="outputContent"></div>
+                <div style="margin-top:10px; font-size:0.85rem; color:#38bdf8;" id="outputVoiceScript"></div>
+            </div>
+        </main>
+    </div>
+
+    <!-- DETAIL & EDIT MODAL -->
+    <div class="modal-overlay" id="detailModal">
+        <div class="modal-card">
+            <button class="modal-close" onclick="closeModal()">✕</button>
+            <div id="modalContent"></div>
+        </div>
+    </div>
+
+    <script>
+        let currentDomain = 'all';
+        let currentSubTopic = 'all';
+        let selectedRecordIds = new Set();
+        let currentRecords = [];
+        let domainConfig = {};
+        let subTopicLabelsMap = {};
+
+        async function loadDomainConfig() {
+            try {
+                const res = await fetch('/api/v1/config/domains');
+                domainConfig = await res.json();
+                
+                // Build subTopicLabelsMap
+                subTopicLabelsMap = {};
+                for (const [dKey, dInfo] of Object.entries(domainConfig)) {
+                    const subTopics = dInfo.sub_topics || {};
+                    for (const [sKey, sInfo] of Object.entries(subTopics)) {
+                        subTopicLabelsMap[sKey] = sInfo.label_he || sKey;
+                    }
+                }
+
+                // Dynamically render Domain Tabs
+                const tabsContainer = document.querySelector('.domain-tabs');
+                if (tabsContainer) {
+                    let tabsHTML = `<button class="tab-btn active" onclick="filterDomain('all', this)">🌐 הכל</button>`;
+                    for (const [key, info] of Object.entries(domainConfig)) {
+                        if (key === 'general') continue;
+                        tabsHTML += `<button class="tab-btn" onclick="filterDomain('${key}', this)">${info.icon || ''} ${info.label_he || key}</button>`;
+                    }
+                    tabsContainer.innerHTML = tabsHTML;
+                }
+
+                // Dynamically render Select Dropdown & Checkboxes in form
+                const capDomainSelect = document.getElementById('capDomain');
+                const capDomainsList = document.getElementById('capDomainsList');
+
+                if (capDomainSelect) {
+                    let selectHTML = '';
+                    for (const [key, info] of Object.entries(domainConfig)) {
+                        selectHTML += `<option value="${key}">${info.icon || ''} ${info.label_he || key} (${info.label_en || key})</option>`;
+                    }
+                    capDomainSelect.innerHTML = selectHTML;
+                }
+
+                if (capDomainsList) {
+                    let cbsHTML = '';
+                    for (const [key, info] of Object.entries(domainConfig)) {
+                        if (key === 'general') continue;
+                        cbsHTML += `<label style="font-size:0.82rem; cursor:pointer;"><input type="checkbox" class="domain-tag-cb" value="${key}"> ${info.icon || ''} ${info.label_he || key}</label>`;
+                    }
+                    capDomainsList.innerHTML = cbsHTML;
+                }
+
+                renderSubTopicsForm();
+                renderSubTopicFilterBar();
+                injectDynamicBadgeCSS();
+                checkSharedUrlParams();
+                fetchRecords();
+            } catch (err) {
+                console.error("Failed to load domain config from YAML:", err);
+                fetchRecords();
+            }
+        }
+
+        function checkSharedUrlParams() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const sharedUrl = urlParams.get('url') || '';
+            const sharedTitle = urlParams.get('title') || '';
+            const sharedText = urlParams.get('text') || '';
+
+            if (sharedUrl || sharedTitle || sharedText) {
+                if (document.getElementById('capSourceUrl') && sharedUrl) {
+                    document.getElementById('capSourceUrl').value = sharedUrl;
+                }
+                if (document.getElementById('capTitle') && sharedTitle) {
+                    document.getElementById('capTitle').value = sharedTitle;
+                }
+                if (document.getElementById('capText') && sharedText) {
+                    document.getElementById('capText').value = sharedText;
+                }
+                autoDetectSourceType();
+            }
+        }
+
+        function renderSubTopicsForm() {
+            const primaryDomain = document.getElementById('capDomain')?.value || 'general';
+            const subTopicsList = document.getElementById('capSubTopicsList');
+            if (!subTopicsList) return;
+
+            let subHTML = '';
+            const domainInfo = domainConfig[primaryDomain];
+            if (domainInfo && domainInfo.sub_topics) {
+                for (const [sKey, sInfo] of Object.entries(domainInfo.sub_topics)) {
+                    subHTML += `<label style="font-size:0.82rem; cursor:pointer;"><input type="checkbox" class="subtopic-tag-cb" value="${sKey}"> 📌 ${sInfo.label_he || sKey}</label>`;
+                }
+            }
+            if (!subHTML) {
+                subHTML = `<span style="font-size:0.8rem; color:#94a3b8;">אין תתי-נושאים מוגדרים לתחום זה ב-domains.yaml</span>`;
+            }
+            subTopicsList.innerHTML = subHTML;
+        }
+
+        function injectDynamicBadgeCSS() {
+            let css = '';
+            for (const [key, info] of Object.entries(domainConfig)) {
+                const bg = info.bg_color || 'rgba(148, 163, 184, 0.2)';
+                const color = info.color || '#cbd5e1';
+                const border = info.border_color || '#94a3b8';
+                css += `.badge-${key} { background: ${bg}; color: ${color}; border: 1px solid ${border}; }\n`;
+            }
+            let styleEl = document.getElementById('dynamic-domain-styles');
+            if (!styleEl) {
+                styleEl = document.createElement('style');
+                styleEl.id = 'dynamic-domain-styles';
+                document.head.appendChild(styleEl);
+            }
+            styleEl.textContent = css;
+        }
+
+        async function fetchRecords() {
+            try {
+                let params = new URLSearchParams();
+                if (currentDomain !== 'all') params.append('domain', currentDomain);
+                if (currentSubTopic !== 'all') params.append('sub_topic', currentSubTopic);
+                const queryStr = params.toString();
+                const url = queryStr ? `/api/v1/search?${queryStr}` : '/api/v1/search';
+
+                const res = await fetch(url);
+                const data = await res.json();
+                currentRecords = data.results || [];
+                
+                document.getElementById('totalRecordsBadge').innerText = `${currentRecords.length} רשומות`;
+
+                const container = document.getElementById('recordsContainer');
+                if (currentRecords.length === 0) {
+                    container.innerHTML = `<p style="color:#94a3b8;">אין רשומות בתחום זה עדיין.</p>`;
+                    return;
+                }
+
+                container.innerHTML = currentRecords.map((r) => {
+                    const keywords = JSON.parse(r.keywords_json || '[]');
+                    const customTags = JSON.parse(r.custom_tags_json || '[]');
+                    const domainData = JSON.parse(r.domain_data_json || '{}');
+                    const subTopics = JSON.parse(r.sub_topics_json || '[]');
+                    const isChecked = selectedRecordIds.has(r.id) ? 'checked' : '';
+
+                    let domainsList = JSON.parse(r.domains_json || '[]');
+                    if (!domainsList.length) domainsList = [r.primary_domain || 'general'];
+                    const badgesHTML = domainsList.map(d => {
+                        const icon = domainConfig[d]?.icon || '';
+                        return `<span class="badge badge-${d}" style="margin-left:4px;">${icon} ${d.toUpperCase()}</span>`;
+                    }).join('');
+
+                    const subTopicsHTML = subTopics.map(st => {
+                        const label = subTopicLabelsMap[st] || st;
+                        return `<span style="background:rgba(56, 189, 248, 0.15); border:1px solid rgba(56, 189, 248, 0.3); padding:2px 8px; border-radius:12px; font-size:0.75rem; margin-left:4px; color:#38bdf8;">📌 ${label}</span>`;
+                    }).join('');
+
+                    const customTagsHTML = customTags.map(ct => {
+                        return `<span style="background:rgba(236, 72, 153, 0.15); border:1px solid rgba(236, 72, 153, 0.4); padding:2px 8px; border-radius:12px; font-size:0.75rem; margin-left:4px; color:#f472b6;">🔖 #${ct}</span>`;
+                    }).join('');
+
+                    let domainMetaHTML = '';
+                    if (r.primary_domain === 'hair' && domainData.problem_type) {
+                        domainMetaHTML = `<div class="domain-meta-box"><b>בעיה:</b> ${domainData.problem_type} | <b>שיטה:</b> ${domainData.method_name || 'כללי'} | <b>רכיבים:</b> ${(domainData.active_ingredients || []).join(', ')}</div>`;
+                    } else if (r.primary_domain === 'culinary' && domainData.dish_type) {
+                        domainMetaHTML = `<div class="domain-meta-box"><b>סוג מנה:</b> ${domainData.dish_type} | <b>רכיבים:</b> ${(domainData.ingredients || []).join(', ')} | <b>טכניקה:</b> ${domainData.technique || ''}</div>`;
+                    } else if (r.primary_domain === 'health' && domainData.condition) {
+                        domainMetaHTML = `<div class="domain-meta-box"><b>מצב רפואי:</b> ${domainData.condition} | <b>מערכת גוף:</b> ${domainData.body_system || ''} | <b>רמת ראיות:</b> ${domainData.evidence_level || ''}</div>`;
+                    } else if (r.primary_domain === 'foraging' && domainData.risk_assessment) {
+                        domainMetaHTML = `<div class="domain-meta-box"><b>אזור:</b> ${domainData.region || ''} | <b>חלקים שמישים:</b> ${(domainData.usable_parts || []).join(', ')}</div>`;
+                    } else if (r.primary_domain === 'mental' && (domainData.practice_type || domainData.emotional_state)) {
+                        domainMetaHTML = `<div class="domain-meta-box"><b>סוג תרגול:</b> ${domainData.practice_type || 'כללי'} | <b>מצב רגשי:</b> ${domainData.emotional_state || ''} | <b>טכניקה:</b> ${domainData.cognitive_technique || ''}</div>`;
+                    } else if (r.primary_domain === 'financial' && (domainData.asset_class || domainData.financial_goal)) {
+                        domainMetaHTML = `<div class="domain-meta-box"><b>אפיק:</b> ${domainData.asset_class || 'כללי'} | <b>יעד פיננסי:</b> ${domainData.financial_goal || ''} | <b>פרופיל סיכון:</b> ${domainData.risk_profile || ''}</div>`;
+                    }
+
+                    const imageHTML = renderImageGallery(r, false);
+
+                    return `
+                        <div class="record-card" onclick="openDetailModal('${r.id}')">
+                            ${r.risk_level === 'high' ? `<div class="risk-banner">⚠️ <b>אזהרת בטיחות וסיכון גבוה:</b> יש להפעיל שיקול דעת ולקבל ייעוץ מקצועי לפני שימוש.</div>` : ''}
+                            
+                            <div class="card-header">
+                                <div class="card-title-box">
+                                    <input type="checkbox" onclick="event.stopPropagation()" onchange="toggleSelect('${r.id}')" ${isChecked} style="width:18px; height:18px; cursor:pointer;">
+                                    <h4 class="card-title">${r.title}</h4>
+                                </div>
+                                <div>${badgesHTML}</div>
+                            </div>
+
+                            <p style="color:#cbd5e1; font-size:0.95rem; margin:0 0 10px 0;">${r.summary || r.transcript || ''}</p>
+                            
+                            ${imageHTML}
+
+                            ${(subTopicsHTML || customTagsHTML) ? `<div style="margin-top:8px; margin-bottom:8px; display:flex; flex-wrap:wrap; gap:4px;">${subTopicsHTML}${customTagsHTML}</div>` : ''}
+
+                            ${domainMetaHTML}
+
+                            <div style="font-size:0.8rem; color:#94a3b8; display:flex; gap:12px; flex-wrap:wrap; margin-top:10px; align-items:center;">
+                                <span>📅 ${r.capture_date}</span>
+                                <span>סוג: <b>${r.source_type}</b></span>
+                                ${r.source_url ? `<span style="color:#06b6d4;">🎬 <a href="${r.source_url}" target="_blank" onclick="event.stopPropagation()" style="color:#06b6d4; font-weight:bold; text-decoration:underline;">צפה בסרטון / פתח קישור ↗</a></span>` : ''}
+                                <span>סטטוס: <b>${r.status}</b></span>
+                                <span>אמינות: <b>${r.reliability_layer}</b></span>
+                            </div>
+                            
+                            ${keywords.length ? `<div style="margin-top:8px;"><b style="font-size:0.78rem; color:#94a3b8;">🔑 מילות מפתח שנשאבו: </b>${keywords.map(k=>`<span style="background:#0f172a; padding:2px 6px; border-radius:4px; font-size:0.75rem; margin-left:4px; color:#38bdf8;">#${k}</span>`).join('')}</div>`:''}
+
+                            <button class="btn-detail" onclick="event.stopPropagation(); toggleInlineCollapsible('${r.id}')">📖 הצג / הסתר תוכן מלא ותמליל בלחיצה</button>
+
+                            <div class="collapsible-body" id="collab-${r.id}" onclick="event.stopPropagation()">
+                                <h5 style="color:#38bdf8; margin:0 0 8px 0;">📝 תמליל ותוכן מלא:</h5>
+                                <p style="font-size:0.9rem; color:#e2e8f0; line-height:1.6; margin:0;">${r.transcript || 'אין תמליל מפורט'}</p>
+                                <div style="margin-top:10px; font-size:0.8rem; color:#a855f7;">
+                                    🔗 <b>קישור ל-Vault:</b> vault/02 By Domain/${r.primary_domain.toUpperCase()}/${r.title.replace(/\s+/g, '_')}_${r.id.substring(0,8)}.md
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                }).join('');
+            } catch (err) {
+                console.error("Error fetching records:", err);
+            }
+        }
+
+        function autoDetectSourceType() {
+            const urlVal = document.getElementById('capSourceUrl')?.value || '';
+            const textVal = document.getElementById('capText')?.value || '';
+            const combined = (urlVal + ' ' + textVal).toLowerCase();
+            const videoRegex = /https?:\/\/(?:www\.)?(?:youtube\.com|youtu\.be|vimeo\.com|tiktok\.com|instagram\.com\/reel|[\w\.-]+\/(?:[^\s]+\.(?:mp4|mov|webm|avi|mkv)))/i;
+            
+            const sourceTypeSelect = document.getElementById('capSourceType');
+            if (!sourceTypeSelect) return;
+
+            if (videoRegex.test(combined) || combined.includes('סרטון') || combined.includes('יוטיוב')) {
+                sourceTypeSelect.value = 'video';
+            }
+        }
+
+        function autoSelectInfographic() {
+            const fileInput = document.getElementById('capFile');
+            const noticeEl = document.getElementById('fileCountNotice');
+            if (fileInput && fileInput.files && fileInput.files.length > 0) {
+                const sourceTypeSelect = document.getElementById('capSourceType');
+                if (sourceTypeSelect) {
+                    sourceTypeSelect.value = 'infographic';
+                }
+                if (noticeEl) {
+                    noticeEl.innerText = `✅ נבחרו ${fileInput.files.length} קבצי אינפוגרפיקה להעלאה לפריט זה`;
+                    noticeEl.style.display = 'block';
+                }
+            } else if (noticeEl) {
+                noticeEl.style.display = 'none';
+            }
+        }
+
+        function renderImageGallery(r, isModal = false) {
+            if (!r.source_url) return '';
+            let urls = [];
+            try {
+                const parsed = JSON.parse(r.source_url);
+                if (Array.isArray(parsed)) urls = parsed;
+                else urls = [r.source_url];
+            } catch (e) {
+                urls = [r.source_url];
+            }
+
+            const isMedia = r.source_type === 'infographic' || urls.some(u => typeof u === 'string' && (u.startsWith('/data/uploads/') || /\.(jpg|jpeg|png|webp|gif)$/i.test(u)));
+            if (!isMedia) return '';
+
+            const maxH = isModal ? '450px' : '220px';
+            const imgsHTML = urls.map(u => `<img src="${u}" alt="${r.title}" style="max-width:100%; max-height:${maxH}; border-radius:8px; border:1px solid #0284c7; object-fit:contain;">`).join('');
+            
+            const countBadge = urls.length > 1 ? `<div style="font-size:0.8rem; color:#38bdf8; margin-bottom:6px; font-weight:bold;">📊 גלריית אינפוגרפיקות (${urls.length} תמונות בפריט):</div>` : '';
+
+            return `<div style="margin-top:10px; text-align:center; background:#020617; padding:10px; border-radius:8px; border:1px solid #1e293b;">
+                ${countBadge}
+                <div style="display:flex; flex-wrap:wrap; gap:10px; justify-content:center; align-items:center;">${imgsHTML}</div>
+            </div>`;
+        }
+
+        async function handleAskKB() {
+            const questionInput = document.getElementById('askQuestion').value.trim();
+            if (!questionInput) {
+                alert("אנא הקלד שאלה לחיפוש במאגר.");
+                return;
+            }
+            const res = await fetch(`/api/v1/ask?question=${encodeURIComponent(questionInput)}`, {
+                method: 'POST'
+            });
+            const data = await res.json();
+
+            document.getElementById('askAnswerBox').style.display = 'block';
+            document.getElementById('askQuestionTitle').innerText = `💬 שאלה: ${data.question}`;
+            document.getElementById('askAnswerText').innerText = data.answer;
+            document.getElementById('askVoiceScript').innerText = `🗣️ הקראה קולית: ${data.voice_script}`;
+        }
+
+        function toggleSelect(id) {
+            if (selectedRecordIds.has(id)) {
+                selectedRecordIds.delete(id);
+            } else {
+                selectedRecordIds.add(id);
+            }
+            document.getElementById('selectedCount').innerText = selectedRecordIds.size;
+        }
+
+        function renderSubTopicFilterBar() {
+            const container = document.getElementById('subTopicFilterButtons');
+            const activeLabel = document.getElementById('activeSubTopicLabel');
+            if (!container) return;
+
+            let subTopicsToRender = {};
+            if (currentDomain === 'all') {
+                for (const [dKey, dInfo] of Object.entries(domainConfig)) {
+                    const subs = dInfo.sub_topics || {};
+                    for (const [sKey, sInfo] of Object.entries(subs)) {
+                        subTopicsToRender[sKey] = sInfo;
+                    }
+                }
+            } else {
+                const dInfo = domainConfig[currentDomain];
+                if (dInfo && dInfo.sub_topics) {
+                    subTopicsToRender = dInfo.sub_topics;
+                }
+            }
+
+            let pillsHTML = `<button class="tab-btn ${currentSubTopic === 'all' ? 'active' : ''}" style="font-size:0.8rem; padding:4px 12px; border-radius:14px;" onclick="filterSubTopic('all', this)">🌐 הכל</button>`;
+            
+            for (const [sKey, sInfo] of Object.entries(subTopicsToRender)) {
+                const isActive = currentSubTopic === sKey ? 'active' : '';
+                const label = sInfo.label_he || sKey;
+                pillsHTML += `<button class="tab-btn ${isActive}" style="font-size:0.8rem; padding:4px 12px; border-radius:14px;" onclick="filterSubTopic('${sKey}', this)">📌 ${label}</button>`;
+            }
+
+            container.innerHTML = pillsHTML;
+            if (activeLabel) {
+                activeLabel.innerText = currentSubTopic === 'all' ? '(הכל)' : (subTopicLabelsMap[currentSubTopic] || currentSubTopic);
+            }
+        }
+
+        function filterSubTopic(subKey, btnElement) {
+            currentSubTopic = subKey;
+            document.querySelectorAll('#subTopicFilterButtons .tab-btn').forEach(btn => btn.classList.remove('active'));
+            if (btnElement) btnElement.classList.add('active');
+            const activeLabel = document.getElementById('activeSubTopicLabel');
+            if (activeLabel) {
+                activeLabel.innerText = currentSubTopic === 'all' ? '(הכל)' : (subTopicLabelsMap[currentSubTopic] || currentSubTopic);
+            }
+            fetchRecords();
+        }
+
+        function filterDomain(domain, btnElement) {
+            currentDomain = domain;
+            currentSubTopic = 'all';
+            document.querySelectorAll('.domain-tabs .tab-btn').forEach(btn => btn.classList.remove('active'));
+            if (btnElement) {
+                btnElement.classList.add('active');
+            }
+            renderSubTopicFilterBar();
+            fetchRecords();
+        }
+
+        function toggleInlineCollapsible(id) {
+            const el = document.getElementById(`collab-${id}`);
+            if (el) {
+                el.classList.toggle('open');
+            }
+        }
+
+        function openDetailModal(id) {
+            const r = currentRecords.find(item => String(item.id) === String(id));
+            if (!r) return;
+
+            const keywords = JSON.parse(r.keywords_json || '[]');
+            const customTags = JSON.parse(r.custom_tags_json || '[]');
+            const domainData = JSON.parse(r.domain_data_json || '{}');
+            const subTopics = JSON.parse(r.sub_topics_json || '[]');
+
+            let domainsList = JSON.parse(r.domains_json || '[]');
+            if (!domainsList.length) domainsList = [r.primary_domain || 'general'];
+
+            const subTopicsLabels = subTopics.map(st => subTopicLabelsMap[st] || st).join(', ');
+
+            const imageGalleryHTML = renderImageGallery(r, true);
+
+            document.getElementById('modalContent').innerHTML = `
+                <h2 style="color:#38bdf8; margin-top:0;">${r.title}</h2>
+                <p style="color:#94a3b8; font-size:0.85rem;">תחומים: <b>${domainsList.map(d => d.toUpperCase()).join(', ')}</b> | סוג מקור: <b>${r.source_type}</b> | אמינות: <b>${r.reliability_layer}</b></p>
+                ${r.source_url ? `<p style="color:#06b6d4; font-size:0.9rem;">🎬 <b>קישור / קובץ:</b> <a href="${r.source_url}" target="_blank" style="color:#06b6d4; font-weight:bold;">${r.source_url} ↗</a></p>` : ''}
+                ${imageGalleryHTML}
+                ${subTopicsLabels ? `<p style="color:#38bdf8; font-size:0.85rem;">📌 תתי-נושאים: <b>${subTopicsLabels}</b></p>` : ''}
+                ${customTags.length ? `<p style="color:#f472b6; font-size:0.85rem;">🔖 תגים אישיים: <b>${customTags.map(t=>`#${t}`).join(', ')}</b></p>` : ''}
+
+                ${r.risk_level === 'high' ? `<div class="risk-banner">⚠️ <b>רמת סיכון גבוהה:</b> ${r.why_saved || 'דורש בירור וזהירות מיוחדת'}</div>` : ''}
+
+                <h3 style="color:#22c55e; font-size:1.1rem; margin-top:1.5rem;">📌 תקציר מנהלים</h3>
+                <p style="color:#e2e8f0; font-size:1rem; line-height:1.6;">${r.summary || 'אין תקציר'}</p>
+
+                <h3 style="color:#22c55e; font-size:1.1rem; margin-top:1.5rem;">🔑 מילות מפתח שנשאבו אוטומטית</h3>
+                <p style="color:#cbd5e1; font-size:0.95rem;">${keywords.map(k=>`<span style="background:#0f172a; padding:3px 8px; border-radius:4px; font-size:0.82rem; margin-left:6px; color:#38bdf8;">#${k}</span>`).join('')}</p>
+
+                <h3 style="color:#22c55e; font-size:1.1rem; margin-top:1.5rem;">📝 תמליל ותוכן מלא</h3>
+                <div style="background:#020617; padding:1rem; border-radius:8px; font-size:0.92rem; color:#cbd5e1; white-space:pre-wrap; max-height:250px; overflow-y:auto;">${r.transcript || 'אין תמליל'}</div>
+
+                <h3 style="color:#22c55e; font-size:1.1rem; margin-top:1.5rem;">🧬 שדות תחום מובנים</h3>
+                <pre style="background:#020617; padding:0.75rem; border-radius:8px; font-size:0.85rem; color:#38bdf8;">${JSON.stringify(domainData, null, 2)}</pre>
+
+                <div style="margin-top:1.5rem; text-align:left;">
+                    <a href="/vault/" target="_blank" style="color:#38bdf8; text-decoration:none; font-weight:bold;">📂 פתח קובץ Markdown ב-Obsidian Vault ↗</a>
+                </div>
+            `;
+            document.getElementById('detailModal').classList.add('active');
+        }
+
+        function closeModal() {
+            document.getElementById('detailModal').classList.remove('active');
+        }
+
+        document.getElementById('captureForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const title = document.getElementById('capTitle').value;
+            const source_url = document.getElementById('capSourceUrl')?.value || '';
+            const source_type = document.getElementById('capSourceType')?.value || 'note';
+            const text = document.getElementById('capText').value;
+            const primary_domain = document.getElementById('capDomain').value;
+            const selectedDomains = Array.from(document.querySelectorAll('.domain-tag-cb:checked')).map(cb => cb.value);
+            const selectedSubTopics = Array.from(document.querySelectorAll('.subtopic-tag-cb:checked')).map(cb => cb.value);
+            const rawCustomTags = document.getElementById('capCustomTags').value.trim();
+            const selectedCustomTags = rawCustomTags ? rawCustomTags.split(',').map(t => t.trim()).filter(Boolean) : [];
+            const fileInput = document.getElementById('capFile');
+
+            if (primary_domain !== 'general' && !selectedDomains.includes(primary_domain)) {
+                selectedDomains.unshift(primary_domain);
+            }
+
+            if (fileInput && fileInput.files && fileInput.files.length > 0) {
+                const formData = new FormData();
+                for (let i = 0; i < fileInput.files.length; i++) {
+                    formData.append('files', fileInput.files[i]);
+                }
+                formData.append('title', title);
+                formData.append('source_type', source_type);
+                formData.append('content_text', text);
+                formData.append('primary_domain', primary_domain);
+                formData.append('domains', selectedDomains.join(','));
+                formData.append('sub_topics', selectedSubTopics.join(','));
+                formData.append('custom_tags', selectedCustomTags.join(','));
+
+                await fetch('/api/v1/capture/upload', {
+                    method: 'POST',
+                    body: formData
+                });
+                fileInput.value = '';
+                const noticeEl = document.getElementById('fileCountNotice');
+                if (noticeEl) noticeEl.style.display = 'none';
+            } else {
+                await fetch('/api/v1/capture', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        title,
+                        source_url,
+                        source_type,
+                        content_text: text,
+                        primary_domain: primary_domain,
+                        domains: selectedDomains,
+                        sub_topics: selectedSubTopics,
+                        custom_tags: selectedCustomTags
+                    })
+                });
+            }
+
+            document.getElementById('capTitle').value = '';
+            if (document.getElementById('capSourceUrl')) document.getElementById('capSourceUrl').value = '';
+            if (document.getElementById('capSourceType')) document.getElementById('capSourceType').value = 'note';
+            document.getElementById('capText').value = '';
+            document.getElementById('capCustomTags').value = '';
+            document.querySelectorAll('.domain-tag-cb').forEach(cb => cb.checked = false);
+            document.querySelectorAll('.subtopic-tag-cb').forEach(cb => cb.checked = false);
+            fetchRecords();
+        });
+
+        async function handleVoiceCapture() {
+            const input = document.getElementById('voiceInput').value.trim();
+            if (!input) {
+                alert("אנא הקלד תמליל קולי בשדה הטקסט.");
+                return;
+            }
+            await fetch('/api/v1/capture/voice', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ voice_note_text: input })
+            });
+
+            document.getElementById('voiceInput').value = '';
+            fetchRecords();
+        }
+
+        async function handleBuildOutput() {
+            if (selectedRecordIds.size === 0) {
+                alert("אנא בחר לפחות רשומה אחת להרכבת תוצר.");
+                return;
+            }
+
+            const output_type = document.getElementById('outType').value;
+            const target_title = document.getElementById('outTitle').value || "תוצר חדש מסונכרן";
+            const record_ids = Array.from(selectedRecordIds);
+
+            const res = await fetch(`/api/v1/outputs/build?output_type=${output_type}&target_title=${encodeURIComponent(target_title)}`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(record_ids)
+            });
+
+            const data = await res.json();
+            document.getElementById('outputResultModal').style.display = 'block';
+            document.getElementById('outputContent').innerText = data.content;
+            document.getElementById('outputVoiceScript').innerText = `🗣️ הקראה קולית: ${data.voice_script}`;
+        }
+
+        document.addEventListener('DOMContentLoaded', loadDomainConfig);
+    </script>
+</body>
+</html>

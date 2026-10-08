@@ -1,0 +1,184 @@
+# Configuration file for Domains and Sub-Topics (תחומים ותתי-נושאים)
+# Edit this file to add, modify, or customize domains, sub-topics, keywords, icons, and badge colors.
+
+domains:
+  general:
+    label_he: "כללי"
+    label_en: "General"
+    icon: "🌐"
+    color: "#cbd5e1"
+    bg_color: "rgba(148, 163, 184, 0.2)"
+    border_color: "#94a3b8"
+    keywords: ["כללי", "מידע", "הערה", "general"]
+    sub_topics:
+      general_notes:
+        label_he: "הערות כלליות"
+        keywords: ["הערה", "רעיון"]
+
+  culinary:
+    label_he: "קולינריה"
+    label_en: "Culinary"
+    icon: "🍳"
+    color: "#fbbf24"
+    bg_color: "rgba(245, 158, 11, 0.2)"
+    border_color: "#f59e0b"
+    keywords: ["מתכון", "בישול", "מרק", "אפייה", "מנה", "אוכל", "culinary"]
+    sub_topics:
+      soups:
+        label_he: "מרקים ותבשילים"
+        keywords: ["מרק", "ציר", "תבשיל"]
+      baking:
+        label_he: "אפייה ובצקים"
+        keywords: ["אפייה", "בצק", "לחם", "עוגה"]
+      sauces:
+        label_he: "רוטבים ותבלינים"
+        keywords: ["רוטב", "תבלין", "מרינדה"]
+      sweets:
+        label_he: "מתוקים"
+        keywords: ["גלטין"]
+  health:
+    label_he: "בריאות"
+    label_en: "Health"
+    icon: "🩺"
+    color: "#34d399"
+    bg_color: "rgba(16, 185, 129, 0.2)"
+    border_color: "#10b981"
+    keywords: ["בריאות", "מעי", "חיסון", "רפואה", "סימפטום", "גוף", "health"]
+    sub_topics:
+      gut_microbiome:
+        label_he: "ציר המעי-מוח ומיקרוביום"
+        keywords: ["מעי", "מיקרוביום", "סרוטונין", "פרוביוטיקה", "בוטיראט"]
+      immunity:
+        label_he: "חיזוק מערכת החיסון"
+        keywords: ["חיסון", "נגיף", "דלקת", "נוגדנים"]
+      supplements:
+        label_he: "תוספי תזונה וויטמינים"
+        keywords: ["תוסף", "וויטמין", "מינרל", "אומגה"]
+      Strength_training:
+        label_he: "אימוני כוח וחיזוק שרירים"
+        keywords: ["כוח", "שריר", "חיזוק", "משקולות"]
+      hair:
+        label_he: "שיער"
+        keywords: ["שיער", "נשירה", "זקיקים", "חפיפה", "שמפו", "מסכה"]
+      scalp_health:
+        label_he: "בריאות הקרקפת"
+        keywords: ["קרקפת", "רוזמרין", "חוחובה", "קשקשים", "שמנים"]
+
+  diet:
+    label_he: "דיאטה"
+    label_en: "Diet"
+    icon: "🥗"
+    color: "#60a5fa"
+    bg_color: "rgba(59, 130, 246, 0.2)"
+    border_color: "#3b82f6"
+    keywords: ["דיאטה", "קלוריות", "צום", "מאקרו", "diet"]
+    sub_topics:
+      intermittent_fasting:
+        label_he: "צום לסירוגין (IF)"
+        keywords: ["צום", "חלון אכילה", "אוטופגיה"]
+      keto_lowcarb:
+        label_he: "קיטו ודל פחמימות"
+        keywords: ["קיטו", "דל פחמימה", "שומן בריא"]
+      macro_tracking:
+        label_he: "חלבונים ומאקרו"
+        keywords: ["חלבון", "קלוריות", "מאקרו", "שריר"]
+
+  garden:
+    label_he: "גינון"
+    label_en: "Garden"
+    icon: "🌱"
+    color: "#4ade80"
+    bg_color: "rgba(34, 197, 94, 0.2)"
+    border_color: "#22c55e"
+    keywords: ["גינון", "צמח", "אדמה", "שתילה", "garden"]
+    sub_topics:
+      herbs:
+        label_he: "צמחי תה ומרפא"
+        keywords: ["נענע", "לואיזה", "מנטה", "שיבא"]
+      veggies:
+        label_he: "גידול ירקות בערוגות"
+        keywords: ["ערוגה", "שתילה", "אדמה", "דשן"]
+      pots_containers:
+        label_he: "גידול באדניות ועציצים"
+        keywords: ["אדנית", "עציץ", "מרפסת"]
+
+  foraging:
+    label_he: "ליקוט"
+    label_en: "Foraging"
+    icon: "🍄"
+    color: "#c084fc"
+    bg_color: "rgba(168, 85, 247, 0.2)"
+    border_color: "#a855f7"
+    keywords: ["ליקוט", "פטריות", "עשבי בר", "foraging"]
+    sub_topics:
+      mushrooms:
+        label_he: "פטריות בר למאכל"
+        keywords: ["פטריות", "אורניה", "אוזנית", "גזענית"]
+      wild_greens:
+        label_he: "עשבי בר למאכל ולתה"
+        keywords: ["עשבי בר", "חוביזה", "חמציץ", "סרפד"]
+      safety_rules:
+        label_he: "כללי בטיחות ורעלים"
+        keywords: ["אזהרה", "רעיל", "אמנית", "סכנה"]
+
+  mental:
+    label_he: "מנטלי"
+    label_en: "Mental"
+    icon: "🧠"
+    color: "#a78bfa"
+    bg_color: "rgba(139, 92, 246, 0.2)"
+    border_color: "#8b5cf6"
+    keywords: ["מנטלי", "מדיטציה", "לחץ", "חרדה", "נפש", "תודעה", "קוגניטיבי", "פסיכולוגיה", "רגש", "מיינדפולנס", "פוקוס", "סטרס", "mental", "mindfulness"]
+    sub_topics:
+      mindfulness_meditation:
+        label_he: "מיינדפולנס ומדיטציה"
+        keywords: ["מדיטציה", "מיינדפולנס", "נשימות", "סריקת גוף"]
+      stress_relief:
+        label_he: "הפחתת מתח וחרדה"
+        keywords: ["חרדה", "סטרס", "קורטיזול", "הרגעה"]
+      focus_cognition:
+        label_he: "מיקוד, זיכרון ופוקוס קוגניטיבי"
+        keywords: ["פוקוס", "ריכוז", "קוגניטיבי", "זיכרון", "למידה"]
+      communication:
+        label_he: "תקשורת"
+        keywords: ["טיפים"]
+
+
+  financial:
+    label_he: "כלכלי"
+    label_en: "Financial"
+    icon: "💰"
+    color: "#34d399"
+    bg_color: "rgba(16, 185, 129, 0.2)"
+    border_color: "#10b981"
+    keywords: ["כלכלי", "תקציב", "השקעה", "כסף", "חיסכון", "מניות", "פיננסי", "נדלן", "נדל\"ן", "פנסיה", "ריבית", "רווח", "financial", "budget"]
+    sub_topics:
+      investments:
+        label_he: "השקעות ומדדי מניות"
+        keywords: ["מניות", "מדדים", "S&P", "בורסה", "נדלן"]
+      budgeting:
+        label_he: "ניהול תקציב וחיסכון משפחתי"
+        keywords: ["תקציב", "חיסכון", "הוצאות", "הכנסות"]
+      pension_fire:
+        label_he: "פנסיה ועצמאות כלכלית (FIRE)"
+        keywords: ["פנסיה", "עצמאות כלכלית", "ריבית דריבית", "פרישה"]
+
+  
+  AI:
+    label_he: "בינה מלאכותית (AI)"
+    label_en: "AI"
+    icon: "🤖"
+    color: "#06b6d4"
+    bg_color: "rgba(6, 182, 212, 0.2)"
+    border_color: "#06b6d4"
+    keywords: ["ai", "בינה מלאכותית", "llm", "gpt", "chatgpt", "midjourney", "claude", "gemini", "פרומפט", "מודל שפה", "אוטומציה", "סרטון", "יוטיוב", "youtube", "video", "פודקאסט", "podcast", "בינה", "מלאכותית"]
+    sub_topics:
+      tips:
+        label_he: "טיפים ופרומפטים"
+        keywords: ["טיפ", "טיפים", "פרומפט", "פרומפטים", "מדריך", "שיטה"]
+      automation:
+        label_he: "אוטומציה וכלים"
+        keywords: ["אוטומציה", "אינטגרציה", "כלים", "סוכנים", "agent", "workflow"]
+      models:
+        label_he: "מודלי שפה ותמונות"
+        keywords: ["מודל", "gpt", "chatgpt", "midjourney", "claude", "gemini", "מחולל"]

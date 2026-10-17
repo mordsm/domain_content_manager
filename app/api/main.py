@@ -57,3 +57,10 @@ def root():
     if template_path.exists():
         return HTMLResponse(content=template_path.read_text(encoding="utf-8"))
     return HTMLResponse(content="<h1>Domain Content Manager API</h1>")
+
+@app.get("/cook-pilot", response_class=HTMLResponse)
+def cook_pilot_app():
+    template_path = Path(__file__).parent.parent / "templates" / "cook_pilot.html"
+    if template_path.exists():
+        return HTMLResponse(content=template_path.read_text(encoding="utf-8"))
+    return HTMLResponse(content="<h1>Cook Pilot</h1>")

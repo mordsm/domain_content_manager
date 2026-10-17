@@ -14,6 +14,17 @@ class ContentCaptureRequest(BaseModel):
     sub_topics: List[str] = Field(default_factory=list)
     custom_tags: List[str] = Field(default_factory=list)
 
+class ContentUpdateRequest(BaseModel):
+    title: Optional[str] = None
+    summary: Optional[str] = None
+    transcript: Optional[str] = None
+    primary_domain: Optional[str] = None
+    domains: Optional[List[str]] = None
+    sub_topics: Optional[List[str]] = None
+    custom_tags: Optional[List[str]] = None
+    source_url: Optional[str] = None
+    source_type: Optional[str] = None
+
 class ContentEnrichRequest(BaseModel):
     record_id: str
     primary_domain: str
@@ -149,6 +160,55 @@ class CookPilotResponse(BaseModel):
     feedback_metrics: List[Dict[str, str]]
     success_criteria: List[str]
     provenance_summary: Dict[str, Any]
+    preheat_plan: Dict[str, str]
+    seasoning_strategy: List[str]
+    allergen_safe_serving: Dict[str, Any]
+    kid_friendly_adjustment: List[str]
+    make_ahead_window: Dict[str, str]
+    emergency_fallback: Dict[str, str]
+    voice_command_map: Dict[str, str]
+    equipment_safety_check: Dict[str, Any]
+    timing_buffer_plan: Dict[str, Any]
+    serving_temperature: Dict[str, str]
+    garnish_plan: List[str]
+    salt_acid_balance: Dict[str, Any]
+    leftover_label_details: Dict[str, str]
+    cleanup_reset_cue: Dict[str, str]
+    portion_scaling_notes: Dict[str, Any]
+    prep_order: List[str]
+    heat_recovery_plan: Dict[str, str]
+    doneness_verification: Dict[str, Any]
+    serving_sequence: List[str]
+    voice_summary_card: Dict[str, str]
+    post_cook_review_prompt: Dict[str, str]
+    allergen_cross_contact_plan: Dict[str, Any]
+    cook_mode: Dict[str, str]
+    shopping_trip_plan: Dict[str, Any]
+    sensory_stop_signals: List[str]
+    plating_timing_plan: Dict[str, str]
+    leftover_risk_flags: List[str]
+    voice_recovery_prompts: List[str]
+    prep_risk_order: List[str]
+    appliance_load_plan: Dict[str, str]
+    taste_calibration: Dict[str, Any]
+    serving_role_assignments: Dict[str, Any]
+    confidence_recheck: Dict[str, Any]
+    cleanup_timeline: Dict[str, Any]
+    next_cook_memory_patch: Dict[str, Any]
+    timing_pressure_flags: Dict[str, Any]
+    substitution_confidence: Dict[str, Any]
+    nutrition_balance_check: Dict[str, Any]
+    heat_zone_plan: Dict[str, str]
+    source_review_queue: List[Dict[str, str]]
+    interruption_safety_check: Dict[str, str]
+    voice_handoff_brief: Dict[str, Any]
+    serving_risk_window: Dict[str, str]
+    batch_hold_strategy: Dict[str, str]
+    flavor_memory_delta: Dict[str, Any]
+    tool_cleanup_order: List[str]
+    ingredient_cut_size_plan: Dict[str, Any]
+    doneness_escalation_path: List[str]
+    voice_timer_brief: Dict[str, Any]
     equipment_gaps: List[str]
     dietary_conflicts: List[str]
     source_trace: List[Dict[str, Any]]

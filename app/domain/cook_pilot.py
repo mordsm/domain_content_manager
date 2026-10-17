@@ -328,6 +328,61 @@ class CookPilotEngine:
         feedback_metrics = self._feedback_metrics(texture_targets, flavor_adjustment_ladder, learning_prompts)
         success_criteria = self._success_criteria(doneness_cues, quality_gate, stop_or_continue)
         provenance_summary = self._provenance_summary(source_trace, source_gaps, confidence_drivers)
+        suggested_commands = self._suggested_commands(step_state)
+        preheat_plan = self._preheat_plan(cooking_method, cookware_plan, time_budget)
+        seasoning_strategy = self._seasoning_strategy(flavor_profile, avoid_ingredients, dietary_preferences)
+        allergen_safe_serving = self._allergen_safe_serving(allergen_flags, risk_review, servings)
+        kid_friendly_adjustment = self._kid_friendly_adjustment(flavor_profile, heat_level, risk_review)
+        make_ahead_window = self._make_ahead_window(cooking_method, leftover_guidance, serving_window)
+        emergency_fallback = self._emergency_fallback(
+            available_ingredients,
+            cooking_method,
+            equipment_gaps,
+            quality_gate,
+        )
+        voice_command_map = self._voice_command_map(suggested_commands, step_state)
+        equipment_safety_check = self._equipment_safety_check(cookware_plan, equipment_gaps, risk_review)
+        timing_buffer_plan = self._timing_buffer_plan(time_budget, estimated_total_minutes, timer_schedule)
+        serving_temperature = self._serving_temperature(cooking_method, risk_review, serving_window)
+        garnish_plan = self._garnish_plan(flavor_profile, available_ingredients, avoid_ingredients)
+        salt_acid_balance = self._salt_acid_balance(flavor_profile, seasoning_strategy)
+        leftover_label_details = self._leftover_label_details(storage_label, leftover_guidance, risk_review)
+        cleanup_reset_cue = self._cleanup_reset_cue(cleanup_effort, cookware_plan, safety_alerts)
+        portion_scaling_notes = self._portion_scaling_notes(servings, portioning_plan, serving_adjustments)
+        prep_order = self._prep_order(mise_en_place, prep_checklist, cooking_method)
+        heat_recovery_plan = self._heat_recovery_plan(cooking_method, heat_level, rescue_tips)
+        doneness_verification = self._doneness_verification(doneness_cues, risk_review, cooking_method)
+        serving_sequence = self._serving_sequence(serving_temperature, plating_variations, table_setup)
+        voice_summary_card = self._voice_summary_card(title, next_action, timing_buffer_plan, risk_review)
+        post_cook_review_prompt = self._post_cook_review_prompt(feedback_metrics, success_criteria, next_session_seed)
+        allergen_cross_contact_plan = self._allergen_cross_contact_plan(allergen_flags, dietary_conflicts)
+        cook_mode = self._cook_mode(active_attention, time_budget, risk_review)
+        shopping_trip_plan = self._shopping_trip_plan(shopping_priority, pantry_readiness, max_minutes)
+        sensory_stop_signals = self._sensory_stop_signals(cooking_method, risk_review, sensory_cues)
+        plating_timing_plan = self._plating_timing_plan(serving_sequence, serving_window, plating_suggestion)
+        leftover_risk_flags = self._leftover_risk_flags(leftover_guidance, risk_review, available_ingredients)
+        voice_recovery_prompts = self._voice_recovery_prompts(interruption_recovery, emergency_fallback, quality_gate)
+        prep_risk_order = self._prep_risk_order(prep_order, safety_alerts, allergen_cross_contact_plan)
+        appliance_load_plan = self._appliance_load_plan(cookware_plan, cooking_method, servings)
+        taste_calibration = self._taste_calibration(flavor_profile, salt_acid_balance, seasoning_strategy)
+        serving_role_assignments = self._serving_role_assignments(servings, cook_mode, table_setup)
+        confidence_recheck = self._confidence_recheck(confidence, quality_gate, stop_or_continue)
+        cleanup_timeline = self._cleanup_timeline(cleanup_plan, cleanup_effort, timing_buffer_plan)
+        next_cook_memory_patch = self._next_cook_memory_patch(next_session_seed, feedback_metrics, source_gaps)
+        timing_pressure_flags = self._timing_pressure_flags(time_budget, active_attention, timing_buffer_plan)
+        substitution_confidence = self._substitution_confidence(substitutions, dietary_conflicts, shopping_list)
+        nutrition_balance_check = self._nutrition_balance_check(nutrition_focus, ingredient_roles)
+        heat_zone_plan = self._heat_zone_plan(cooking_method, heat_level, cookware_plan)
+        source_review_queue = self._source_review_queue(source_trace, source_gaps, confidence)
+        interruption_safety_check = self._interruption_safety_check(interruption_recovery, risk_review, heat_level)
+        voice_handoff_brief = self._voice_handoff_brief(voice_summary_card, voice_recovery_prompts, suggested_commands)
+        serving_risk_window = self._serving_risk_window(serving_window, risk_review, leftover_label_details)
+        batch_hold_strategy = self._batch_hold_strategy(batch_plan, holding_plan, appliance_load_plan)
+        flavor_memory_delta = self._flavor_memory_delta(flavor_profile, taste_calibration, feedback_metrics)
+        tool_cleanup_order = self._tool_cleanup_order(cookware_plan, cleanup_timeline, equipment_safety_check)
+        ingredient_cut_size_plan = self._ingredient_cut_size_plan(cooking_method, available_ingredients, time_budget)
+        doneness_escalation_path = self._doneness_escalation_path(doneness_verification, sensory_stop_signals, heat_recovery_plan)
+        voice_timer_brief = self._voice_timer_brief(timer_schedule, step_timer_minutes, timing_pressure_flags)
         save_candidate = self._save_candidate(
             title=title,
             goal=goal,
@@ -403,8 +458,56 @@ class CookPilotEngine:
             feedback_metrics=feedback_metrics,
             success_criteria=success_criteria,
             provenance_summary=provenance_summary,
+            preheat_plan=preheat_plan,
+            seasoning_strategy=seasoning_strategy,
+            allergen_safe_serving=allergen_safe_serving,
+            kid_friendly_adjustment=kid_friendly_adjustment,
+            make_ahead_window=make_ahead_window,
+            emergency_fallback=emergency_fallback,
+            voice_command_map=voice_command_map,
+            equipment_safety_check=equipment_safety_check,
+            timing_buffer_plan=timing_buffer_plan,
+            serving_temperature=serving_temperature,
+            garnish_plan=garnish_plan,
+            salt_acid_balance=salt_acid_balance,
+            leftover_label_details=leftover_label_details,
+            cleanup_reset_cue=cleanup_reset_cue,
+            portion_scaling_notes=portion_scaling_notes,
+            prep_order=prep_order,
+            heat_recovery_plan=heat_recovery_plan,
+            doneness_verification=doneness_verification,
+            serving_sequence=serving_sequence,
+            voice_summary_card=voice_summary_card,
+            post_cook_review_prompt=post_cook_review_prompt,
+            allergen_cross_contact_plan=allergen_cross_contact_plan,
+            cook_mode=cook_mode,
+            shopping_trip_plan=shopping_trip_plan,
+            sensory_stop_signals=sensory_stop_signals,
+            plating_timing_plan=plating_timing_plan,
+            leftover_risk_flags=leftover_risk_flags,
+            voice_recovery_prompts=voice_recovery_prompts,
+            prep_risk_order=prep_risk_order,
+            appliance_load_plan=appliance_load_plan,
+            taste_calibration=taste_calibration,
+            serving_role_assignments=serving_role_assignments,
+            confidence_recheck=confidence_recheck,
+            cleanup_timeline=cleanup_timeline,
+            next_cook_memory_patch=next_cook_memory_patch,
+            timing_pressure_flags=timing_pressure_flags,
+            substitution_confidence=substitution_confidence,
+            nutrition_balance_check=nutrition_balance_check,
+            heat_zone_plan=heat_zone_plan,
+            source_review_queue=source_review_queue,
+            interruption_safety_check=interruption_safety_check,
+            voice_handoff_brief=voice_handoff_brief,
+            serving_risk_window=serving_risk_window,
+            batch_hold_strategy=batch_hold_strategy,
+            flavor_memory_delta=flavor_memory_delta,
+            tool_cleanup_order=tool_cleanup_order,
+            ingredient_cut_size_plan=ingredient_cut_size_plan,
+            doneness_escalation_path=doneness_escalation_path,
+            voice_timer_brief=voice_timer_brief,
         )
-        suggested_commands = self._suggested_commands(step_state)
 
         speech = self._voice_text(title, next_action, step_state["is_complete"], cautions)
         voice_res = tts_service.synthesize_speech(speech)
@@ -491,6 +594,55 @@ class CookPilotEngine:
             "feedback_metrics": feedback_metrics,
             "success_criteria": success_criteria,
             "provenance_summary": provenance_summary,
+            "preheat_plan": preheat_plan,
+            "seasoning_strategy": seasoning_strategy,
+            "allergen_safe_serving": allergen_safe_serving,
+            "kid_friendly_adjustment": kid_friendly_adjustment,
+            "make_ahead_window": make_ahead_window,
+            "emergency_fallback": emergency_fallback,
+            "voice_command_map": voice_command_map,
+            "equipment_safety_check": equipment_safety_check,
+            "timing_buffer_plan": timing_buffer_plan,
+            "serving_temperature": serving_temperature,
+            "garnish_plan": garnish_plan,
+            "salt_acid_balance": salt_acid_balance,
+            "leftover_label_details": leftover_label_details,
+            "cleanup_reset_cue": cleanup_reset_cue,
+            "portion_scaling_notes": portion_scaling_notes,
+            "prep_order": prep_order,
+            "heat_recovery_plan": heat_recovery_plan,
+            "doneness_verification": doneness_verification,
+            "serving_sequence": serving_sequence,
+            "voice_summary_card": voice_summary_card,
+            "post_cook_review_prompt": post_cook_review_prompt,
+            "allergen_cross_contact_plan": allergen_cross_contact_plan,
+            "cook_mode": cook_mode,
+            "shopping_trip_plan": shopping_trip_plan,
+            "sensory_stop_signals": sensory_stop_signals,
+            "plating_timing_plan": plating_timing_plan,
+            "leftover_risk_flags": leftover_risk_flags,
+            "voice_recovery_prompts": voice_recovery_prompts,
+            "prep_risk_order": prep_risk_order,
+            "appliance_load_plan": appliance_load_plan,
+            "taste_calibration": taste_calibration,
+            "serving_role_assignments": serving_role_assignments,
+            "confidence_recheck": confidence_recheck,
+            "cleanup_timeline": cleanup_timeline,
+            "next_cook_memory_patch": next_cook_memory_patch,
+            "timing_pressure_flags": timing_pressure_flags,
+            "substitution_confidence": substitution_confidence,
+            "nutrition_balance_check": nutrition_balance_check,
+            "heat_zone_plan": heat_zone_plan,
+            "source_review_queue": source_review_queue,
+            "interruption_safety_check": interruption_safety_check,
+            "voice_handoff_brief": voice_handoff_brief,
+            "serving_risk_window": serving_risk_window,
+            "batch_hold_strategy": batch_hold_strategy,
+            "flavor_memory_delta": flavor_memory_delta,
+            "tool_cleanup_order": tool_cleanup_order,
+            "ingredient_cut_size_plan": ingredient_cut_size_plan,
+            "doneness_escalation_path": doneness_escalation_path,
+            "voice_timer_brief": voice_timer_brief,
             "equipment_gaps": equipment_gaps,
             "dietary_conflicts": dietary_conflicts,
             "source_trace": source_trace,
@@ -537,10 +689,17 @@ class CookPilotEngine:
     ) -> list[str]:
         plan = []
         context = voice_input or goal.replace("_", " ")
-        plan.append(f"Confirm the cooking direction: {context}.")
+        dish_name = self._recipe_name(available_ingredients, matched_records, context)
+        method = self._cooking_method(matched_records, goal, voice_input)
+        primary = ", ".join(available_ingredients[:4]) if available_ingredients else "your chosen ingredients"
+        servings_text = f" for {servings} servings" if servings else ""
+        time_text = f" in about {max_minutes} minutes" if max_minutes else ""
+        plan.append(f"Recipe: make {dish_name}{servings_text}{time_text}.")
 
         if available_ingredients:
-            plan.append(f"Use the available base ingredients first: {', '.join(available_ingredients)}.")
+            plan.append(f"Prep the ingredients: wash, trim, and cut {primary} into even pieces.")
+            plan.append(f"Cook the base: {self._recipe_method_step(method, available_ingredients)}")
+            plan.append(f"Season and balance: add salt, acid, heat, or fat in small rounds, tasting between changes.")
         else:
             plan.append("Start by choosing 2-3 available base ingredients before committing to a recipe.")
 
@@ -572,6 +731,32 @@ class CookPilotEngine:
 
         plan.append("Before serving, taste once for salt, acid, heat, and texture, then make one final adjustment.")
         return plan
+
+    def _recipe_name(
+        self,
+        available_ingredients: list[str],
+        matched_records: list[dict[str, Any]],
+        context: str,
+    ) -> str:
+        if matched_records:
+            return matched_records[0]["record"].title
+        if len(available_ingredients) >= 2:
+            return f"{available_ingredients[0].title()} {available_ingredients[1].title()} Skillet"
+        if available_ingredients:
+            return f"Simple {available_ingredients[0].title()} Plate"
+        return context.title()
+
+    def _recipe_method_step(self, method: str, available_ingredients: list[str]) -> str:
+        base = ", ".join(available_ingredients[:3]) if available_ingredients else "the base ingredients"
+        if method == "simmer":
+            return f"simmer {base} with enough water or stock to soften everything without scorching."
+        if method == "bake":
+            return f"spread {base} on the tray and bake until tender, browned, or fragrant."
+        if method == "blend":
+            return f"blend {base} until the texture is smooth enough, then adjust thickness."
+        if method == "pan_cook":
+            return f"saute {base} in a hot pan, stirring until tender and lightly colored."
+        return f"cook {base} with the simplest available method until tender and hot through."
 
     def _ingredient_gaps(
         self,
@@ -2002,6 +2187,889 @@ class CookPilotEngine:
             "source_titles": [source["title"] for source in source_trace],
         }
 
+    def _preheat_plan(
+        self,
+        cooking_method: str,
+        cookware_plan: dict[str, Any],
+        time_budget: dict[str, Any],
+    ) -> dict[str, str]:
+        if cooking_method == "bake":
+            timing = "start_now" if time_budget["status"] != "tight" else "start_immediately"
+            action = "Preheat the oven before final prep and warm the tray only if the recipe benefits from crisp edges."
+        elif cooking_method == "pan_cook":
+            timing = "after_prep"
+            action = "Heat the pan only after knife work is done so the first ingredients do not scorch."
+        elif cooking_method == "simmer":
+            timing = "after_base_prep"
+            action = "Set the pot on low heat after the base is ready, then raise heat once liquid is added."
+        elif cooking_method == "blend":
+            timing = "not_needed"
+            action = "No preheat needed; assemble blender parts and keep liquid nearby for texture control."
+        else:
+            timing = "as_needed"
+            action = "Delay heat until ingredients and tools are within reach."
+        return {
+            "timing": timing,
+            "primary_tool": cookware_plan["primary"] or "available cookware",
+            "action": action,
+        }
+
+    def _seasoning_strategy(
+        self,
+        flavor_profile: list[str],
+        avoid_ingredients: list[str],
+        dietary_preferences: list[str],
+    ) -> list[str]:
+        strategy = ["Season in small rounds and taste between changes."]
+        if "savory" in flavor_profile or "umami" in flavor_profile:
+            strategy.append("Build savory depth before adding extra salt.")
+        if "acidic" in flavor_profile:
+            strategy.append("Hold back some acid for a final brightness check.")
+        if "sweet" in flavor_profile:
+            strategy.append("Balance sweetness with a pinch of salt or a mild acidic note.")
+        if avoid_ingredients:
+            strategy.append(f"Do not use avoided ingredients as seasoning shortcuts: {', '.join(avoid_ingredients)}.")
+        if dietary_preferences:
+            strategy.append(f"Check seasonings against dietary preferences: {', '.join(dietary_preferences)}.")
+        return strategy
+
+    def _allergen_safe_serving(
+        self,
+        allergen_flags: list[dict[str, str]],
+        risk_review: dict[str, Any],
+        servings: int | None,
+    ) -> dict[str, Any]:
+        if not allergen_flags:
+            return {
+                "status": "no_known_flags",
+                "separate_serving_needed": False,
+                "guidance": "No common allergen flags were detected from known ingredients.",
+            }
+        allergens = sorted({flag["allergen"] for flag in allergen_flags})
+        serving_note = f"Label all {servings} servings" if servings else "Label the serving dish"
+        return {
+            "status": "review_required" if risk_review["requires_review"] else "flagged",
+            "separate_serving_needed": True,
+            "allergens": allergens,
+            "guidance": f"{serving_note} and keep utensils separate for: {', '.join(allergens)}.",
+        }
+
+    def _kid_friendly_adjustment(
+        self,
+        flavor_profile: list[str],
+        heat_level: str,
+        risk_review: dict[str, Any],
+    ) -> list[str]:
+        adjustments = ["Keep one portion mildly seasoned until after tasting."]
+        if "acidic" in flavor_profile:
+            adjustments.append("Add sharp or acidic elements at the table for sensitive eaters.")
+        if "umami" in flavor_profile or "savory" in flavor_profile:
+            adjustments.append("Offer a plain starch or bread-like side if the flavor is intense.")
+        if "high" in heat_level or risk_review["level"] == "high":
+            adjustments.append("Cool and inspect a small portion before serving to children.")
+        return adjustments
+
+    def _make_ahead_window(
+        self,
+        cooking_method: str,
+        leftover_guidance: list[str],
+        serving_window: dict[str, str],
+    ) -> dict[str, str]:
+        if cooking_method == "simmer":
+            window = "same_day_or_next_day"
+            guidance = "Simmered dishes can usually rest well; reheat gently and recheck thickness."
+        elif cooking_method == "bake":
+            window = "same_day_best"
+            guidance = "Bake close to serving if crispness matters; refresh briefly before serving."
+        elif cooking_method == "pan_cook":
+            window = "serve_best_fresh"
+            guidance = "Prep components ahead, but cook close to serving for texture."
+        else:
+            window = "short_window"
+            guidance = "Prep ahead only if texture will not suffer."
+        if leftover_guidance:
+            guidance = f"{guidance} Follow leftover rule: {leftover_guidance[0]}"
+        return {
+            "window": window,
+            "serving_timing": serving_window["window"],
+            "guidance": guidance,
+        }
+
+    def _emergency_fallback(
+        self,
+        available_ingredients: list[str],
+        cooking_method: str,
+        equipment_gaps: list[str],
+        quality_gate: dict[str, Any],
+    ) -> dict[str, str]:
+        base = ", ".join(available_ingredients[:3]) if available_ingredients else "the safest available ingredients"
+        if quality_gate["status"] == "blocked":
+            action = f"Pause the plan and make a simple low-risk plate from {base}."
+        elif equipment_gaps:
+            action = f"Skip the missing-tool method and use {base} in the simplest available cookware."
+        elif cooking_method == "pan_cook":
+            action = f"Lower heat, add a splash of liquid, and turn {base} into a quick soft saute."
+        elif cooking_method == "simmer":
+            action = f"Add liquid and simmer {base} until tender enough to serve simply."
+        elif cooking_method == "bake":
+            action = f"Slice {base} smaller and use a quick pan or raw-prep version if the oven path fails."
+        else:
+            action = f"Simplify to {base}, season lightly, and stop before quality drops."
+        return {
+            "trigger": "time, tool, safety, or confidence problem",
+            "action": action,
+        }
+
+    def _voice_command_map(
+        self,
+        suggested_commands: list[str],
+        step_state: dict[str, Any],
+    ) -> dict[str, str]:
+        command_map = {
+            "next": "advance to the next cooking step",
+            "repeat": "repeat the current instruction",
+            "back": "return to the previous step",
+            "stop": "finish the session and switch to serving or storage",
+        }
+        active = {command: command_map[command] for command in suggested_commands if command in command_map}
+        active["where_am_i"] = f"report current step {step_state['current_step']} of {step_state['total_steps']}"
+        return active
+
+    def _equipment_safety_check(
+        self,
+        cookware_plan: dict[str, Any],
+        equipment_gaps: list[str],
+        risk_review: dict[str, Any],
+    ) -> dict[str, Any]:
+        checks = ["Keep handles stable and clear one heat-safe landing zone."]
+        if cookware_plan["primary"]:
+            checks.append(f"Confirm the {cookware_plan['primary']} is clean, dry, and sized for the batch.")
+        if equipment_gaps:
+            checks.append(f"Do not improvise with unsafe substitutes for: {', '.join(equipment_gaps)}.")
+        if risk_review["requires_review"]:
+            checks.append("Review risk flags before switching tools or serving.")
+        return {
+            "status": "review_required" if equipment_gaps or risk_review["requires_review"] else "ready",
+            "checks": checks,
+        }
+
+    def _timing_buffer_plan(
+        self,
+        time_budget: dict[str, Any],
+        estimated_total_minutes: int | None,
+        timer_schedule: list[dict[str, Any]],
+    ) -> dict[str, Any]:
+        target = estimated_total_minutes or time_budget["target_minutes"]
+        if time_budget["status"] == "tight":
+            buffer_minutes = 2
+            guidance = "Use only essential steps and start serving setup early."
+        elif target and target >= 40:
+            buffer_minutes = 10
+            guidance = "Reserve a longer buffer for simmering, cooling, and texture checks."
+        else:
+            buffer_minutes = 5
+            guidance = "Keep a small buffer for tasting, plating, and cleanup."
+        return {
+            "buffer_minutes": buffer_minutes,
+            "target_minutes": target,
+            "last_timer_step": timer_schedule[-1]["step"] if timer_schedule else None,
+            "guidance": guidance,
+        }
+
+    def _serving_temperature(
+        self,
+        cooking_method: str,
+        risk_review: dict[str, Any],
+        serving_window: dict[str, str],
+    ) -> dict[str, str]:
+        if risk_review["level"] == "high":
+            target = "serve_hot_or_chill_promptly"
+            guidance = "Serve hot immediately, or cool quickly and refrigerate."
+        elif cooking_method == "bake":
+            target = "warm"
+            guidance = "Let steam settle briefly so crisp or baked texture holds."
+        elif cooking_method == "simmer":
+            target = "hot"
+            guidance = "Serve hot after a final stir and thickness check."
+        else:
+            target = "ready_to_eat"
+            guidance = "Serve when texture and seasoning are at their best."
+        return {
+            "target": target,
+            "window": serving_window["window"],
+            "guidance": guidance,
+        }
+
+    def _garnish_plan(
+        self,
+        flavor_profile: list[str],
+        available_ingredients: list[str],
+        avoid_ingredients: list[str],
+    ) -> list[str]:
+        plan = []
+        if "lemon" in available_ingredients and "lemon" not in avoid_ingredients:
+            plan.append("Finish with a small lemon accent only after tasting.")
+        if "fresh" in flavor_profile:
+            plan.append("Use fresh elements at the end so they stay bright.")
+        if "creamy" in flavor_profile:
+            plan.append("Add creamy elements off heat to keep texture smooth.")
+        if not plan:
+            plan.append("Keep garnish minimal and only add it if it improves the final bite.")
+        return plan
+
+    def _salt_acid_balance(
+        self,
+        flavor_profile: list[str],
+        seasoning_strategy: list[str],
+    ) -> dict[str, Any]:
+        next_move = "taste_before_adjusting"
+        if "acidic" in flavor_profile:
+            next_move = "check_acid_last"
+        elif "sweet" in flavor_profile:
+            next_move = "add_tiny_salt_if_flat"
+        return {
+            "next_move": next_move,
+            "has_acid": "acidic" in flavor_profile,
+            "has_savory_depth": "savory" in flavor_profile or "umami" in flavor_profile,
+            "reminder": seasoning_strategy[0] if seasoning_strategy else "Taste before changing the dish.",
+        }
+
+    def _leftover_label_details(
+        self,
+        storage_label: dict[str, str],
+        leftover_guidance: list[str],
+        risk_review: dict[str, Any],
+    ) -> dict[str, str]:
+        cooling_deadline = "cool_within_2_hours" if risk_review["level"] == "high" else "cool_before_covering"
+        note = leftover_guidance[0] if leftover_guidance else "Label with dish name and date."
+        return {
+            "label": storage_label["label"],
+            "cooling_deadline": cooling_deadline,
+            "note": note,
+        }
+
+    def _cleanup_reset_cue(
+        self,
+        cleanup_effort: dict[str, Any],
+        cookware_plan: dict[str, Any],
+        safety_alerts: list[str],
+    ) -> dict[str, str]:
+        tool = cookware_plan["primary"] or "main tool"
+        if safety_alerts:
+            cue = f"Sanitize surfaces after handling risk ingredients, then wash the {tool}."
+        else:
+            cue = f"Reset the counter and wash the {tool} once it is cool enough."
+        return {
+            "level": cleanup_effort["level"],
+            "cue": cue,
+        }
+
+    def _portion_scaling_notes(
+        self,
+        servings: int | None,
+        portioning_plan: dict[str, Any],
+        serving_adjustments: list[str],
+    ) -> dict[str, Any]:
+        target_servings = servings or portioning_plan["servings"]
+        notes = list(serving_adjustments)
+        if not notes:
+            notes.append("Keep portions flexible and season lightly until the final taste.")
+        if target_servings and target_servings >= 5:
+            notes.append("Scale seasoning in two passes so the batch stays balanced.")
+        return {
+            "servings": target_servings,
+            "mode": portioning_plan["mode"],
+            "notes": notes,
+        }
+
+    def _prep_order(
+        self,
+        mise_en_place: dict[str, list[str]],
+        prep_checklist: list[str],
+        cooking_method: str,
+    ) -> list[str]:
+        order = []
+        if mise_en_place["tools_ready"]:
+            order.append(f"Set tools first: {', '.join(mise_en_place['tools_ready'][:3])}.")
+        if mise_en_place["prep_first"]:
+            order.append(f"Prep first: {', '.join(mise_en_place['prep_first'][:4])}.")
+        order.extend(prep_checklist[:2])
+        if cooking_method in {"pan_cook", "bake"}:
+            order.append("Start heat only after the first ingredients are ready.")
+        return order or ["Choose tools, prep ingredients, then start heat."]
+
+    def _heat_recovery_plan(
+        self,
+        cooking_method: str,
+        heat_level: str,
+        rescue_tips: list[str],
+    ) -> dict[str, str]:
+        if cooking_method == "pan_cook":
+            action = "Drop heat, move food off the hottest spot, and add a splash of liquid if needed."
+        elif cooking_method == "bake":
+            action = "Lower oven heat or cover loosely if edges color before the center is ready."
+        elif cooking_method == "simmer":
+            action = "Lower to a gentle bubble and add liquid in small amounts if the pot tightens."
+        else:
+            action = "Pause, simplify, and adjust texture before continuing."
+        return {
+            "heat_level": heat_level,
+            "action": action,
+            "first_rescue_tip": rescue_tips[0] if rescue_tips else action,
+        }
+
+    def _doneness_verification(
+        self,
+        doneness_cues: list[str],
+        risk_review: dict[str, Any],
+        cooking_method: str,
+    ) -> dict[str, Any]:
+        checks = doneness_cues[:2] or ["Taste and confirm the texture is intentional."]
+        if risk_review["level"] == "high":
+            checks.append("Confirm higher-risk ingredients are fully cooked before serving.")
+        return {
+            "method": cooking_method,
+            "requires_extra_check": risk_review["requires_review"],
+            "checks": checks,
+        }
+
+    def _serving_sequence(
+        self,
+        serving_temperature: dict[str, str],
+        plating_variations: list[str],
+        table_setup: dict[str, Any],
+    ) -> list[str]:
+        sequence = [
+            f"Set table for {table_setup['style']} service.",
+            f"Serve at {serving_temperature['target']} within {serving_temperature['window']}.",
+        ]
+        if plating_variations:
+            sequence.append(plating_variations[0])
+        sequence.append("Label leftovers before the kitchen reset.")
+        return sequence
+
+    def _voice_summary_card(
+        self,
+        title: str,
+        next_action: str,
+        timing_buffer_plan: dict[str, Any],
+        risk_review: dict[str, Any],
+    ) -> dict[str, str]:
+        return {
+            "headline": title,
+            "say_now": next_action,
+            "buffer": f"{timing_buffer_plan['buffer_minutes']} minute buffer",
+            "risk": risk_review["level"],
+        }
+
+    def _post_cook_review_prompt(
+        self,
+        feedback_metrics: list[dict[str, str]],
+        success_criteria: list[str],
+        next_session_seed: dict[str, Any],
+    ) -> dict[str, str]:
+        metric_question = feedback_metrics[0]["question"] if feedback_metrics else "What should change next time?"
+        success_check = success_criteria[0] if success_criteria else "Was the final dish worth repeating?"
+        return {
+            "question": metric_question,
+            "success_check": success_check,
+            "next_goal": next_session_seed["suggested_goal"],
+        }
+
+    def _allergen_cross_contact_plan(
+        self,
+        allergen_flags: list[dict[str, str]],
+        dietary_conflicts: list[str],
+    ) -> dict[str, Any]:
+        allergens = sorted({flag["allergen"] for flag in allergen_flags})
+        review_needed = bool(allergens or dietary_conflicts)
+        actions = []
+        if allergens:
+            actions.append("Use clean tools and serving surfaces before handling flagged ingredients.")
+            actions.append(f"Label servings that include: {', '.join(allergens)}.")
+        if dietary_conflicts:
+            actions.append("Confirm dietary conflicts before cooking or serving.")
+        return {
+            "review_needed": review_needed,
+            "allergens": allergens,
+            "actions": actions or ["No cross-contact controls needed beyond normal clean prep."],
+        }
+
+    def _cook_mode(
+        self,
+        active_attention: dict[str, Any],
+        time_budget: dict[str, Any],
+        risk_review: dict[str, Any],
+    ) -> dict[str, str]:
+        if risk_review["level"] == "high":
+            mode = "supervised"
+        elif time_budget["status"] == "tight":
+            mode = "speed_run"
+        elif active_attention["level"] == "high":
+            mode = "hands_on"
+        else:
+            mode = "steady"
+        return {
+            "mode": mode,
+            "attention": active_attention["level"],
+            "timing": time_budget["status"],
+        }
+
+    def _shopping_trip_plan(
+        self,
+        shopping_priority: list[dict[str, str]],
+        pantry_readiness: dict[str, Any],
+        max_minutes: int | None,
+    ) -> dict[str, Any]:
+        must_buy = [item["item"] for item in shopping_priority if item["priority"] in {"required", "review", "high"}]
+        optional = [item["item"] for item in shopping_priority if item["priority"] == "optional"]
+        if pantry_readiness["status"] == "ready":
+            mode = "skip_shop"
+        elif max_minutes and max_minutes <= 20:
+            mode = "cook_now_minimize_shop"
+        else:
+            mode = "short_shop"
+        return {
+            "mode": mode,
+            "must_buy": must_buy,
+            "optional": optional[:3],
+        }
+
+    def _sensory_stop_signals(
+        self,
+        cooking_method: str,
+        risk_review: dict[str, Any],
+        sensory_cues: list[str],
+    ) -> list[str]:
+        signals = ["Stop and reassess if smell turns burnt, sour, or smoky."]
+        if cooking_method == "pan_cook":
+            signals.append("Pause if the pan smokes or food sticks faster than you can stir.")
+        elif cooking_method == "bake":
+            signals.append("Pause if edges darken before the center is close to done.")
+        elif cooking_method == "simmer":
+            signals.append("Pause if boiling is aggressive or the pot bottom starts catching.")
+        if risk_review["requires_review"]:
+            signals.append("Stop before serving until risk checks are confirmed.")
+        if sensory_cues:
+            signals.append(f"Expected cue to recover toward: {sensory_cues[0]}")
+        return signals
+
+    def _plating_timing_plan(
+        self,
+        serving_sequence: list[str],
+        serving_window: dict[str, str],
+        plating_suggestion: str | None,
+    ) -> dict[str, str]:
+        first_move = serving_sequence[0] if serving_sequence else "Set serving dishes before the final taste."
+        return {
+            "first_move": first_move,
+            "window": serving_window["window"],
+            "finish": plating_suggestion or "Plate simply after the final seasoning check.",
+        }
+
+    def _leftover_risk_flags(
+        self,
+        leftover_guidance: list[str],
+        risk_review: dict[str, Any],
+        available_ingredients: list[str],
+    ) -> list[str]:
+        flags = []
+        if risk_review["level"] == "high":
+            flags.append("High-risk leftovers need prompt cooling and clear labels.")
+        if "rice" in available_ingredients:
+            flags.append("Rice leftovers need shallow cooling and prompt refrigeration.")
+        if leftover_guidance:
+            flags.append(leftover_guidance[0])
+        return flags or ["No special leftover risk flags detected."]
+
+    def _voice_recovery_prompts(
+        self,
+        interruption_recovery: dict[str, str],
+        emergency_fallback: dict[str, str],
+        quality_gate: dict[str, Any],
+    ) -> list[str]:
+        prompts = [
+            f"Resume at step {interruption_recovery['resume_step']}: {interruption_recovery['action']}",
+            f"Fallback: {emergency_fallback['action']}",
+        ]
+        if quality_gate["status"] == "blocked":
+            prompts.insert(0, "Pause and clear the quality gate before continuing.")
+        return prompts
+
+    def _prep_risk_order(
+        self,
+        prep_order: list[str],
+        safety_alerts: list[str],
+        allergen_cross_contact_plan: dict[str, Any],
+    ) -> list[str]:
+        order = []
+        if safety_alerts:
+            order.append("Handle safety-sensitive ingredients before ready-to-eat prep.")
+        if allergen_cross_contact_plan["review_needed"]:
+            order.append("Set clean tools aside for allergen-sensitive servings before prep starts.")
+        order.extend(prep_order[:3])
+        return order or ["Prep low-risk ingredients first, then start heat."]
+
+    def _appliance_load_plan(
+        self,
+        cookware_plan: dict[str, Any],
+        cooking_method: str,
+        servings: int | None,
+    ) -> dict[str, str]:
+        primary = cookware_plan["primary"] or "available cookware"
+        if servings and servings >= 5:
+            load = "large_batch"
+            guidance = f"Do not crowd the {primary}; cook in batches if heat drops."
+        elif cooking_method == "bake":
+            load = "single_layer"
+            guidance = f"Spread food evenly on the {primary} for predictable browning."
+        elif cooking_method == "pan_cook":
+            load = "medium_load"
+            guidance = f"Keep the {primary} less than two-thirds full so stirring stays easy."
+        else:
+            load = "normal"
+            guidance = f"Use the {primary} with enough headroom for stirring and bubbling."
+        return {
+            "primary_tool": primary,
+            "load": load,
+            "guidance": guidance,
+        }
+
+    def _taste_calibration(
+        self,
+        flavor_profile: list[str],
+        salt_acid_balance: dict[str, Any],
+        seasoning_strategy: list[str],
+    ) -> dict[str, Any]:
+        checkpoints = ["Taste once before adding more seasoning."]
+        if "acidic" in flavor_profile:
+            checkpoints.append("Check acid after salt, not before.")
+        if "sweet" in flavor_profile:
+            checkpoints.append("Balance sweetness with salt or acid in tiny steps.")
+        if "savory" in flavor_profile or "umami" in flavor_profile:
+            checkpoints.append("Check depth before adding more salt.")
+        return {
+            "next_move": salt_acid_balance["next_move"],
+            "checkpoints": checkpoints,
+            "baseline": seasoning_strategy[0] if seasoning_strategy else "Taste first.",
+        }
+
+    def _serving_role_assignments(
+        self,
+        servings: int | None,
+        cook_mode: dict[str, str],
+        table_setup: dict[str, Any],
+    ) -> dict[str, Any]:
+        helpers_needed = bool(servings and servings >= 4) or cook_mode["mode"] == "supervised"
+        roles = ["cook: stay with heat and final seasoning."]
+        if helpers_needed:
+            roles.append("helper: set table, label restrictions, and clear landing zone.")
+        roles.append(f"service: use {table_setup['style']} plating.")
+        return {
+            "helpers_needed": helpers_needed,
+            "roles": roles,
+        }
+
+    def _confidence_recheck(
+        self,
+        confidence: dict[str, Any],
+        quality_gate: dict[str, Any],
+        stop_or_continue: dict[str, str],
+    ) -> dict[str, Any]:
+        triggers = []
+        if confidence["band"] != "high":
+            triggers.append("Confidence is not high; verify the next step before heat.")
+        if quality_gate["status"] == "blocked":
+            triggers.append("Quality gate is blocked.")
+        if stop_or_continue["decision"] != "continue":
+            triggers.append(f"Decision is {stop_or_continue['decision']}.")
+        return {
+            "required": bool(triggers),
+            "score": confidence["score"],
+            "triggers": triggers or ["No confidence recheck needed before continuing."],
+        }
+
+    def _cleanup_timeline(
+        self,
+        cleanup_plan: list[str],
+        cleanup_effort: dict[str, Any],
+        timing_buffer_plan: dict[str, Any],
+    ) -> dict[str, Any]:
+        first = cleanup_effort.get("first_action", "Clear one landing zone.")
+        timeline = [f"Before heat: {first}"]
+        if cleanup_plan:
+            timeline.append(f"During buffer: {cleanup_plan[0]}")
+        timeline.append(f"After serving: use {timing_buffer_plan['buffer_minutes']} minute buffer for reset.")
+        return {
+            "level": cleanup_effort["level"],
+            "timeline": timeline,
+        }
+
+    def _next_cook_memory_patch(
+        self,
+        next_session_seed: dict[str, Any],
+        feedback_metrics: list[dict[str, str]],
+        source_gaps: list[str],
+    ) -> dict[str, Any]:
+        prompts = [metric["question"] for metric in feedback_metrics[:2]]
+        if source_gaps:
+            prompts.append("Add or link a trusted culinary source before repeating.")
+        return {
+            "suggested_goal": next_session_seed["suggested_goal"],
+            "remember": prompts or ["Record what worked and what should change."],
+            "source_gap_count": len(source_gaps),
+        }
+
+    def _timing_pressure_flags(
+        self,
+        time_budget: dict[str, Any],
+        active_attention: dict[str, Any],
+        timing_buffer_plan: dict[str, Any],
+    ) -> dict[str, Any]:
+        flags = []
+        if time_budget["status"] == "tight":
+            flags.append("Tight time budget: skip optional steps and plate simply.")
+        if active_attention["level"] == "high":
+            flags.append("High attention: avoid leaving the heat unattended.")
+        if timing_buffer_plan["buffer_minutes"] <= 2:
+            flags.append("Small buffer: start serving setup early.")
+        return {
+            "level": "high" if flags else "normal",
+            "flags": flags or ["Timing pressure is normal."],
+        }
+
+    def _substitution_confidence(
+        self,
+        substitutions: list[dict[str, Any]],
+        dietary_conflicts: list[str],
+        shopping_list: list[str],
+    ) -> dict[str, Any]:
+        if dietary_conflicts:
+            level = "review_required"
+        elif substitutions:
+            level = "medium"
+        else:
+            level = "high"
+        blockers = list(dietary_conflicts[:3])
+        return {
+            "level": level,
+            "available_swaps": len(substitutions),
+            "missing_items": shopping_list[:5],
+            "blockers": blockers,
+        }
+
+    def _nutrition_balance_check(
+        self,
+        nutrition_focus: dict[str, Any],
+        ingredient_roles: list[dict[str, str]],
+    ) -> dict[str, Any]:
+        groups = set(nutrition_focus["groups"])
+        missing = []
+        if not ({"protein", "plant_protein"} & groups):
+            missing.append("protein")
+        if "vegetable" not in groups and "fruit" not in groups:
+            missing.append("produce")
+        if "starch" not in groups:
+            missing.append("starch")
+        return {
+            "status": "balanced" if not missing else "needs_balance",
+            "missing": missing,
+            "role_count": len(ingredient_roles),
+        }
+
+    def _heat_zone_plan(
+        self,
+        cooking_method: str,
+        heat_level: str,
+        cookware_plan: dict[str, Any],
+    ) -> dict[str, str]:
+        tool = cookware_plan["primary"] or "cookware"
+        if cooking_method == "pan_cook":
+            zones = "hot center, cooler edge"
+            action = f"Use the {tool} center for browning and edges for holding."
+        elif cooking_method == "bake":
+            zones = "middle rack"
+            action = f"Keep the {tool} centered for even heat."
+        elif cooking_method == "simmer":
+            zones = "gentle bubble zone"
+            action = f"Keep the {tool} at a steady low bubble."
+        else:
+            zones = "no active heat"
+            action = "Use heat only after texture and seasoning are planned."
+        return {
+            "heat_level": heat_level,
+            "zones": zones,
+            "action": action,
+        }
+
+    def _source_review_queue(
+        self,
+        source_trace: list[dict[str, Any]],
+        source_gaps: list[str],
+        confidence: dict[str, Any],
+    ) -> list[dict[str, str]]:
+        queue = [
+            {
+                "title": source["title"],
+                "reason": f"matched by {source['match_reason']}",
+            }
+            for source in source_trace[:3]
+        ]
+        if source_gaps:
+            queue.append({"title": "Source gap review", "reason": ", ".join(source_gaps[:3])})
+        if confidence["band"] == "low":
+            queue.append({"title": "Confidence review", "reason": confidence["reason"]})
+        return queue
+
+    def _interruption_safety_check(
+        self,
+        interruption_recovery: dict[str, str],
+        risk_review: dict[str, Any],
+        heat_level: str,
+    ) -> dict[str, str]:
+        if risk_review["requires_review"]:
+            action = "Turn heat down or off and complete risk checks before stepping away."
+            status = "review_required"
+        elif "high" in heat_level:
+            action = "Lower heat before stepping away, then resume from the recorded step."
+            status = "watch_heat"
+        else:
+            action = interruption_recovery["action"]
+            status = "ready"
+        return {
+            "status": status,
+            "resume_step": interruption_recovery["resume_step"],
+            "action": action,
+        }
+
+    def _voice_handoff_brief(
+        self,
+        voice_summary_card: dict[str, str],
+        voice_recovery_prompts: list[str],
+        suggested_commands: list[str],
+    ) -> dict[str, Any]:
+        commands = ", ".join(suggested_commands)
+        return {
+            "headline": voice_summary_card["headline"],
+            "say_first": voice_summary_card["say_now"],
+            "recovery": voice_recovery_prompts[0] if voice_recovery_prompts else "Ask for the current step.",
+            "commands": commands,
+        }
+
+    def _serving_risk_window(
+        self,
+        serving_window: dict[str, str],
+        risk_review: dict[str, Any],
+        leftover_label_details: dict[str, str],
+    ) -> dict[str, str]:
+        if risk_review["level"] == "high":
+            priority = "serve_or_chill_promptly"
+            action = f"Use {leftover_label_details['cooling_deadline']} if food is not served in time."
+        else:
+            priority = "serve_when_ready"
+            action = serving_window["reason"]
+        return {
+            "window": serving_window["window"],
+            "priority": priority,
+            "action": action,
+        }
+
+    def _batch_hold_strategy(
+        self,
+        batch_plan: dict[str, Any],
+        holding_plan: dict[str, str],
+        appliance_load_plan: dict[str, str],
+    ) -> dict[str, str]:
+        if batch_plan["mode"] == "large_batch":
+            mode = "stagger_batches"
+            guidance = f"Hold finished portions loosely covered; {appliance_load_plan['guidance']}"
+        else:
+            mode = holding_plan["mode"]
+            guidance = holding_plan["guidance"]
+        return {
+            "mode": mode,
+            "load": appliance_load_plan["load"],
+            "guidance": guidance,
+        }
+
+    def _flavor_memory_delta(
+        self,
+        flavor_profile: list[str],
+        taste_calibration: dict[str, Any],
+        feedback_metrics: list[dict[str, str]],
+    ) -> dict[str, Any]:
+        focus = flavor_profile[:3] or ["balanced"]
+        questions = [metric["question"] for metric in feedback_metrics if metric["metric"] in {"flavor", "learning"}]
+        return {
+            "focus": focus,
+            "next_move": taste_calibration["next_move"],
+            "questions": questions[:2] or ["What flavor adjustment should carry forward?"],
+        }
+
+    def _tool_cleanup_order(
+        self,
+        cookware_plan: dict[str, Any],
+        cleanup_timeline: dict[str, Any],
+        equipment_safety_check: dict[str, Any],
+    ) -> list[str]:
+        order = []
+        if cookware_plan["primary"]:
+            order.append(f"Let {cookware_plan['primary']} cool before washing.")
+        order.extend(cleanup_timeline["timeline"][:2])
+        if equipment_safety_check["status"] == "review_required":
+            order.append("Sanitize reviewed tools and surfaces before storage.")
+        return order or ["Clear tools, wipe surfaces, and reset the station."]
+
+    def _ingredient_cut_size_plan(
+        self,
+        cooking_method: str,
+        available_ingredients: list[str],
+        time_budget: dict[str, Any],
+    ) -> dict[str, Any]:
+        if time_budget["status"] == "tight":
+            size = "small_even_pieces"
+            reason = "smaller pieces cook faster under a tight time budget."
+        elif cooking_method == "simmer":
+            size = "medium_even_pieces"
+            reason = "even pieces simmer at the same pace."
+        elif cooking_method == "bake":
+            size = "thin_even_pieces"
+            reason = "thin pieces bake more predictably."
+        else:
+            size = "bite_size"
+            reason = "bite-size prep keeps texture easy to check."
+        return {
+            "size": size,
+            "ingredients": available_ingredients[:5],
+            "reason": reason,
+        }
+
+    def _doneness_escalation_path(
+        self,
+        doneness_verification: dict[str, Any],
+        sensory_stop_signals: list[str],
+        heat_recovery_plan: dict[str, str],
+    ) -> list[str]:
+        path = list(doneness_verification["checks"][:2])
+        if sensory_stop_signals:
+            path.append(sensory_stop_signals[0])
+        path.append(heat_recovery_plan["action"])
+        return path
+
+    def _voice_timer_brief(
+        self,
+        timer_schedule: list[dict[str, Any]],
+        step_timer_minutes: int | None,
+        timing_pressure_flags: dict[str, Any],
+    ) -> dict[str, Any]:
+        next_timer = step_timer_minutes or 0
+        return {
+            "next_timer_minutes": next_timer,
+            "total_timers": len(timer_schedule),
+            "pressure": timing_pressure_flags["level"],
+            "say": f"Set {next_timer} minute timer now." if next_timer else "No timer needed for the current step.",
+        }
+
     def _match_payload(self, match: dict[str, Any]) -> dict[str, Any]:
         record = match["record"]
         match_reason = self._match_reason(match)
@@ -2109,6 +3177,55 @@ class CookPilotEngine:
         feedback_metrics: list[dict[str, str]],
         success_criteria: list[str],
         provenance_summary: dict[str, Any],
+        preheat_plan: dict[str, str],
+        seasoning_strategy: list[str],
+        allergen_safe_serving: dict[str, Any],
+        kid_friendly_adjustment: list[str],
+        make_ahead_window: dict[str, str],
+        emergency_fallback: dict[str, str],
+        voice_command_map: dict[str, str],
+        equipment_safety_check: dict[str, Any],
+        timing_buffer_plan: dict[str, Any],
+        serving_temperature: dict[str, str],
+        garnish_plan: list[str],
+        salt_acid_balance: dict[str, Any],
+        leftover_label_details: dict[str, str],
+        cleanup_reset_cue: dict[str, str],
+        portion_scaling_notes: dict[str, Any],
+        prep_order: list[str],
+        heat_recovery_plan: dict[str, str],
+        doneness_verification: dict[str, Any],
+        serving_sequence: list[str],
+        voice_summary_card: dict[str, str],
+        post_cook_review_prompt: dict[str, str],
+        allergen_cross_contact_plan: dict[str, Any],
+        cook_mode: dict[str, str],
+        shopping_trip_plan: dict[str, Any],
+        sensory_stop_signals: list[str],
+        plating_timing_plan: dict[str, str],
+        leftover_risk_flags: list[str],
+        voice_recovery_prompts: list[str],
+        prep_risk_order: list[str],
+        appliance_load_plan: dict[str, str],
+        taste_calibration: dict[str, Any],
+        serving_role_assignments: dict[str, Any],
+        confidence_recheck: dict[str, Any],
+        cleanup_timeline: dict[str, Any],
+        next_cook_memory_patch: dict[str, Any],
+        timing_pressure_flags: dict[str, Any],
+        substitution_confidence: dict[str, Any],
+        nutrition_balance_check: dict[str, Any],
+        heat_zone_plan: dict[str, str],
+        source_review_queue: list[dict[str, str]],
+        interruption_safety_check: dict[str, str],
+        voice_handoff_brief: dict[str, Any],
+        serving_risk_window: dict[str, str],
+        batch_hold_strategy: dict[str, str],
+        flavor_memory_delta: dict[str, Any],
+        tool_cleanup_order: list[str],
+        ingredient_cut_size_plan: dict[str, Any],
+        doneness_escalation_path: list[str],
+        voice_timer_brief: dict[str, Any],
     ) -> dict[str, Any]:
         lines = [
             f"Goal: {goal}",
@@ -2134,6 +3251,19 @@ class CookPilotEngine:
             f"Quality gate: {quality_gate['status']}",
             f"Table setup: {table_setup['style']}",
             f"Provenance: {provenance_summary['source_count']} sources / {provenance_summary['gap_count']} gaps",
+            f"Preheat plan: {preheat_plan['timing']} / {preheat_plan['primary_tool']}",
+            f"Make-ahead window: {make_ahead_window['window']}",
+            f"Timing buffer: {timing_buffer_plan['buffer_minutes']} minutes",
+            f"Serving temperature: {serving_temperature['target']}",
+            f"Portion scaling: {portion_scaling_notes['servings']} servings / {portion_scaling_notes['mode']}",
+            f"Heat recovery: {heat_recovery_plan['heat_level']}",
+            f"Cook mode: {cook_mode['mode']}",
+            f"Appliance load: {appliance_load_plan['load']}",
+            f"Confidence recheck: {confidence_recheck['required']}",
+            f"Timing pressure: {timing_pressure_flags['level']}",
+            f"Nutrition balance: {nutrition_balance_check['status']}",
+            f"Serving risk window: {serving_risk_window['priority']}",
+            f"Voice timer: {voice_timer_brief['next_timer_minutes']} minutes",
             "",
             "Plan:",
         ]
@@ -2304,6 +3434,148 @@ class CookPilotEngine:
             lines.append("")
             lines.append("Success criteria:")
             lines.extend(f"- {item}" for item in success_criteria)
+        lines.append("")
+        lines.append(f"Preheat action: {preheat_plan['action']}")
+        if seasoning_strategy:
+            lines.append("")
+            lines.append("Seasoning strategy:")
+            lines.extend(f"- {item}" for item in seasoning_strategy)
+        lines.append("")
+        lines.append(f"Allergen-safe serving: {allergen_safe_serving['status']} - {allergen_safe_serving['guidance']}")
+        if kid_friendly_adjustment:
+            lines.append("")
+            lines.append("Kid-friendly adjustment:")
+            lines.extend(f"- {item}" for item in kid_friendly_adjustment)
+        lines.append("")
+        lines.append(f"Make-ahead guidance: {make_ahead_window['guidance']}")
+        lines.append("")
+        lines.append(f"Emergency fallback: {emergency_fallback['action']}")
+        if voice_command_map:
+            lines.append("")
+            lines.append("Voice command map:")
+            lines.extend(f"- {command}: {meaning}" for command, meaning in voice_command_map.items())
+        if equipment_safety_check["checks"]:
+            lines.append("")
+            lines.append("Equipment safety check:")
+            lines.extend(f"- {item}" for item in equipment_safety_check["checks"])
+        lines.append("")
+        lines.append(f"Timing buffer guidance: {timing_buffer_plan['guidance']}")
+        lines.append("")
+        lines.append(f"Serving temperature guidance: {serving_temperature['guidance']}")
+        if garnish_plan:
+            lines.append("")
+            lines.append("Garnish plan:")
+            lines.extend(f"- {item}" for item in garnish_plan)
+        lines.append("")
+        lines.append(f"Salt-acid balance: {salt_acid_balance['next_move']}")
+        lines.append("")
+        lines.append(f"Leftover label details: {leftover_label_details['label']} / {leftover_label_details['cooling_deadline']}")
+        lines.append("")
+        lines.append(f"Cleanup reset cue: {cleanup_reset_cue['cue']}")
+        if portion_scaling_notes["notes"]:
+            lines.append("")
+            lines.append("Portion scaling notes:")
+            lines.extend(f"- {item}" for item in portion_scaling_notes["notes"])
+        if prep_order:
+            lines.append("")
+            lines.append("Prep order:")
+            lines.extend(f"- {item}" for item in prep_order)
+        lines.append("")
+        lines.append(f"Heat recovery plan: {heat_recovery_plan['action']}")
+        if doneness_verification["checks"]:
+            lines.append("")
+            lines.append("Doneness verification:")
+            lines.extend(f"- {item}" for item in doneness_verification["checks"])
+        if serving_sequence:
+            lines.append("")
+            lines.append("Serving sequence:")
+            lines.extend(f"- {item}" for item in serving_sequence)
+        lines.append("")
+        lines.append(f"Voice summary card: {voice_summary_card['buffer']} / risk {voice_summary_card['risk']}")
+        lines.append("")
+        lines.append(f"Post-cook review prompt: {post_cook_review_prompt['question']}")
+        lines.append("")
+        lines.append(f"Allergen cross-contact plan: {allergen_cross_contact_plan['review_needed']}")
+        lines.append("")
+        lines.append(f"Shopping trip plan: {shopping_trip_plan['mode']}")
+        if sensory_stop_signals:
+            lines.append("")
+            lines.append("Sensory stop signals:")
+            lines.extend(f"- {item}" for item in sensory_stop_signals)
+        lines.append("")
+        lines.append(f"Plating timing plan: {plating_timing_plan['window']}")
+        if leftover_risk_flags:
+            lines.append("")
+            lines.append("Leftover risk flags:")
+            lines.extend(f"- {item}" for item in leftover_risk_flags)
+        if voice_recovery_prompts:
+            lines.append("")
+            lines.append("Voice recovery prompts:")
+            lines.extend(f"- {item}" for item in voice_recovery_prompts)
+        if prep_risk_order:
+            lines.append("")
+            lines.append("Prep risk order:")
+            lines.extend(f"- {item}" for item in prep_risk_order)
+        lines.append("")
+        lines.append(f"Appliance load plan: {appliance_load_plan['primary_tool']} / {appliance_load_plan['load']}")
+        if taste_calibration["checkpoints"]:
+            lines.append("")
+            lines.append("Taste calibration:")
+            lines.extend(f"- {item}" for item in taste_calibration["checkpoints"])
+        if serving_role_assignments["roles"]:
+            lines.append("")
+            lines.append("Serving role assignments:")
+            lines.extend(f"- {item}" for item in serving_role_assignments["roles"])
+        if confidence_recheck["triggers"]:
+            lines.append("")
+            lines.append("Confidence recheck:")
+            lines.extend(f"- {item}" for item in confidence_recheck["triggers"])
+        if cleanup_timeline["timeline"]:
+            lines.append("")
+            lines.append("Cleanup timeline:")
+            lines.extend(f"- {item}" for item in cleanup_timeline["timeline"])
+        if next_cook_memory_patch["remember"]:
+            lines.append("")
+            lines.append("Next cook memory patch:")
+            lines.extend(f"- {item}" for item in next_cook_memory_patch["remember"])
+        if timing_pressure_flags["flags"]:
+            lines.append("")
+            lines.append("Timing pressure flags:")
+            lines.extend(f"- {item}" for item in timing_pressure_flags["flags"])
+        lines.append("")
+        lines.append(f"Substitution confidence: {substitution_confidence['level']}")
+        lines.append("")
+        lines.append(f"Nutrition balance check: {nutrition_balance_check['status']}")
+        lines.append("")
+        lines.append(f"Heat zone plan: {heat_zone_plan['zones']} - {heat_zone_plan['action']}")
+        if source_review_queue:
+            lines.append("")
+            lines.append("Source review queue:")
+            lines.extend(f"- {item['title']}: {item['reason']}" for item in source_review_queue)
+        lines.append("")
+        lines.append(f"Interruption safety check: {interruption_safety_check['status']} - {interruption_safety_check['action']}")
+        lines.append("")
+        lines.append(f"Voice handoff brief: {voice_handoff_brief['commands']}")
+        lines.append("")
+        lines.append(f"Serving risk window: {serving_risk_window['window']} / {serving_risk_window['priority']}")
+        lines.append("")
+        lines.append(f"Batch hold strategy: {batch_hold_strategy['mode']} - {batch_hold_strategy['guidance']}")
+        if flavor_memory_delta["questions"]:
+            lines.append("")
+            lines.append("Flavor memory delta:")
+            lines.extend(f"- {item}" for item in flavor_memory_delta["questions"])
+        if tool_cleanup_order:
+            lines.append("")
+            lines.append("Tool cleanup order:")
+            lines.extend(f"- {item}" for item in tool_cleanup_order)
+        lines.append("")
+        lines.append(f"Ingredient cut size plan: {ingredient_cut_size_plan['size']} - {ingredient_cut_size_plan['reason']}")
+        if doneness_escalation_path:
+            lines.append("")
+            lines.append("Doneness escalation path:")
+            lines.extend(f"- {item}" for item in doneness_escalation_path)
+        lines.append("")
+        lines.append(f"Voice timer brief: {voice_timer_brief['say']}")
         if source_trace:
             lines.append("")
             lines.append("Source trace:")

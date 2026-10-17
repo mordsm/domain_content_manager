@@ -1,0 +1,412 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cook Pilot</title>
+    <style>
+        * { box-sizing: border-box; }
+        body {
+            margin: 0;
+            min-height: 100vh;
+            background: #0b0f14;
+            color: #f8fafc;
+            font-family: Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Arial, sans-serif;
+        }
+        .shell {
+            display: grid;
+            grid-template-columns: 360px 1fr;
+            gap: 16px;
+            max-width: 1480px;
+            margin: 0 auto;
+            padding: 16px;
+        }
+        .topbar {
+            grid-column: 1 / -1;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            border: 1px solid #1f2937;
+            background: #111827;
+            border-radius: 8px;
+            padding: 12px 14px;
+        }
+        .brand {
+            font-size: 1.1rem;
+            font-weight: 900;
+            color: #f8fafc;
+        }
+        .backbone {
+            color: #94a3b8;
+            font-size: 0.86rem;
+        }
+        .panel {
+            border: 1px solid #1f2937;
+            background: #111827;
+            border-radius: 8px;
+            padding: 14px;
+        }
+        .panel h2, .panel h3 {
+            margin: 0 0 12px;
+            color: #bae6fd;
+            font-size: 1rem;
+        }
+        label {
+            display: block;
+            color: #94a3b8;
+            font-size: 0.78rem;
+            font-weight: 800;
+            margin-bottom: 5px;
+        }
+        input, textarea {
+            width: 100%;
+            background: #020617;
+            border: 1px solid #334155;
+            color: #f8fafc;
+            border-radius: 8px;
+            padding: 9px 10px;
+            font: inherit;
+        }
+        textarea { min-height: 76px; resize: vertical; }
+        .field { margin-bottom: 11px; }
+        .split {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 8px;
+        }
+        .actions {
+            display: grid;
+            grid-template-columns: repeat(4, minmax(0, 1fr));
+            gap: 8px;
+            margin-top: 10px;
+        }
+        button {
+            border: 1px solid #334155;
+            background: #0f172a;
+            color: #e2e8f0;
+            border-radius: 8px;
+            padding: 9px 10px;
+            font-weight: 900;
+            cursor: pointer;
+        }
+        button.primary { background: #0284c7; border-color: #38bdf8; color: #fff; }
+        button.warn { background: #7f1d1d; border-color: #ef4444; }
+        button.good { background: #14532d; border-color: #22c55e; }
+        button:disabled { opacity: 0.55; cursor: wait; }
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(4, minmax(0, 1fr));
+            gap: 12px;
+        }
+        .card {
+            background: #020617;
+            border: 1px solid #1f2937;
+            border-radius: 8px;
+            padding: 12px;
+            min-height: 110px;
+        }
+        .card strong {
+            display: block;
+            color: #7dd3fc;
+            font-size: 0.76rem;
+            margin-bottom: 7px;
+            text-transform: uppercase;
+        }
+        .value {
+            font-size: 1rem;
+            font-weight: 900;
+            overflow-wrap: anywhere;
+        }
+        .sub {
+            margin-top: 6px;
+            color: #94a3b8;
+            font-size: 0.82rem;
+            line-height: 1.45;
+        }
+        .lanes {
+            display: grid;
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+            gap: 12px;
+            margin-top: 12px;
+        }
+        ul { margin: 0; padding-left: 18px; color: #dbeafe; line-height: 1.55; font-size: 0.88rem; }
+        .pills { display: flex; flex-wrap: wrap; gap: 6px; margin: 12px 0; }
+        .pill {
+            border: 1px solid #334155;
+            border-radius: 999px;
+            padding: 4px 9px;
+            font-size: 0.78rem;
+            color: #cbd5e1;
+            background: #0f172a;
+            font-weight: 800;
+        }
+        .progress {
+            height: 10px;
+            border-radius: 999px;
+            border: 1px solid #334155;
+            background: #020617;
+            overflow: hidden;
+            margin-bottom: 12px;
+        }
+        #progressBar { height: 100%; width: 0%; background: #38bdf8; }
+        .empty {
+            border: 1px dashed #334155;
+            color: #94a3b8;
+            padding: 28px;
+            border-radius: 8px;
+            text-align: center;
+            background: #020617;
+        }
+        @media (max-width: 980px) {
+            .shell { grid-template-columns: 1fr; }
+            .grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+            .lanes { grid-template-columns: 1fr; }
+        }
+        @media (max-width: 620px) {
+            .grid, .actions, .split { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+    <main class="shell">
+        <header class="topbar">
+            <div class="brand">Cook Pilot</div>
+            <div class="backbone">Shared Obsidian backbone only</div>
+        </header>
+
+        <aside class="panel">
+            <h2>Session</h2>
+            <div class="field"><label>Goal</label><input id="goal" value="cook_with_what_i_have"></div>
+            <div class="field"><label>Available ingredients</label><input id="ingredients" placeholder="tomato, rice, garlic"></div>
+            <div class="field"><label>Avoid ingredients</label><input id="avoid" placeholder="peanut, dairy"></div>
+            <div class="field"><label>Dietary preferences</label><input id="diet" placeholder="vegan, gluten-free"></div>
+            <div class="field"><label>Equipment</label><input id="equipment" placeholder="pot, pan, oven"></div>
+            <div class="split">
+                <div class="field"><label>Servings</label><input id="servings" type="number" min="1"></div>
+                <div class="field"><label>Minutes</label><input id="minutes" type="number" min="1"></div>
+            </div>
+            <div class="field"><label>Voice prompt</label><textarea id="voiceInput" placeholder="I have tomato and rice, make something fast"></textarea></div>
+            <label style="display:flex; align-items:center; gap:8px;"><input id="useSources" type="checkbox" checked style="width:auto;"> Search saved culinary notes</label>
+            <div class="actions">
+                <button class="primary" onclick="planCook()">Plan</button>
+                <button onclick="commandCook('next')">Next</button>
+                <button onclick="commandCook('back')">Back</button>
+                <button class="warn" onclick="commandCook('stop')">Stop</button>
+            </div>
+            <div class="actions">
+                <button class="good" onclick="saveSession()">Save</button>
+                <button onclick="copySummary()">Copy</button>
+                <button onclick="saveDraft()">Draft</button>
+                <button onclick="restoreDraft()">Restore</button>
+            </div>
+        </aside>
+
+        <section class="panel">
+            <h2>Live Cockpit <span id="status" class="pill">idle</span></h2>
+            <div id="empty" class="empty">Create a cooking plan to start the cockpit.</div>
+            <div id="cockpit" style="display:none;">
+                <div class="progress"><div id="progressBar"></div></div>
+                <div class="grid">
+                    <div class="card"><strong>Now</strong><div id="now" class="value">-</div><div id="stepMeta" class="sub">-</div></div>
+                    <div class="card"><strong>Timer</strong><div id="timer" class="value">-</div><div id="timerBrief" class="sub">-</div></div>
+                    <div class="card"><strong>Risk</strong><div id="risk" class="value">-</div><div id="riskBrief" class="sub">-</div></div>
+                    <div class="card"><strong>Readiness</strong><div id="ready" class="value">-</div><div id="readyBrief" class="sub">-</div></div>
+                </div>
+                <div id="pills" class="pills"></div>
+                <div class="lanes">
+                    <div class="card"><strong>Checks</strong><ul id="checks"></ul></div>
+                    <div class="card"><strong>Plan</strong><ul id="plan"></ul></div>
+                    <div class="card"><strong>Sources</strong><ul id="sources"></ul></div>
+                </div>
+                <div class="lanes">
+                    <div class="card"><strong>Heat</strong><ul id="heat"></ul></div>
+                    <div class="card"><strong>Serve</strong><ul id="serve"></ul></div>
+                    <div class="card"><strong>Voice</strong><ul id="voice"></ul></div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <script>
+        let lastPlan = null;
+        let lastRequest = null;
+
+        function splitTerms(id) {
+            const value = document.getElementById(id).value.trim();
+            return value ? value.split(',').map(item => item.trim()).filter(Boolean) : [];
+        }
+
+        function numberOrNull(id) {
+            const value = Number(document.getElementById(id).value);
+            return Number.isFinite(value) && value > 0 ? value : null;
+        }
+
+        function buildRequest(command = null) {
+            return {
+                goal: document.getElementById('goal').value || 'cook_with_what_i_have',
+                available_ingredients: splitTerms('ingredients'),
+                avoid_ingredients: splitTerms('avoid'),
+                dietary_preferences: splitTerms('diet'),
+                equipment: splitTerms('equipment'),
+                servings: numberOrNull('servings'),
+                max_minutes: numberOrNull('minutes'),
+                voice_input: document.getElementById('voiceInput').value || null,
+                current_step: lastPlan ? lastPlan.current_step : 1,
+                command,
+                include_saved_sources: document.getElementById('useSources').checked
+            };
+        }
+
+        function validateRequest(request) {
+            const issues = [];
+            if (!request.available_ingredients.length && !request.voice_input) issues.push('Add ingredients or a voice prompt.');
+            if (!request.goal.trim()) issues.push('Goal is required.');
+            return issues;
+        }
+
+        function setBusy(isBusy) {
+            document.getElementById('status').textContent = isBusy ? 'planning' : (lastPlan ? 'active' : 'idle');
+            document.querySelectorAll('button').forEach(button => button.disabled = isBusy);
+        }
+
+        function list(id, items) {
+            const clean = (items || []).filter(Boolean);
+            document.getElementById(id).innerHTML = clean.length ? clean.map(item => `<li>${String(item)}</li>`).join('') : '<li>No items.</li>';
+        }
+
+        function timerSummary(plan) {
+            const timer = plan.voice_timer_brief || {};
+            return {
+                value: timer.next_timer_minutes || plan.step_timer_minutes || 0,
+                text: timer.say || plan.voice_checkpoint || 'No timer needed.'
+            };
+        }
+
+        function riskSummary(plan) {
+            const review = plan.risk_review || {};
+            return {
+                level: review.level || 'none',
+                text: (review.issues || []).slice(0, 2).join(' | ') || plan.quality_gate?.status || 'open'
+            };
+        }
+
+        function sourceSummary(plan) {
+            return [
+                ...(plan.source_trace || []).map(source => `${source.title} (${source.match_reason})`).slice(0, 3),
+                ...(plan.source_gaps || []).slice(0, 2)
+            ];
+        }
+
+        function printableSummary(plan) {
+            return [
+                plan.generated_note_title || plan.title,
+                `Step: ${plan.current_step}/${plan.total_steps}`,
+                `Risk: ${plan.risk_review?.level || 'none'}`,
+                '',
+                ...(plan.suggested_plan || []).map((step, index) => `${index + 1}. ${step}`)
+            ].join('\n');
+        }
+
+        function renderPlan(plan) {
+            lastPlan = plan;
+            document.getElementById('empty').style.display = 'none';
+            document.getElementById('cockpit').style.display = 'block';
+            document.getElementById('progressBar').style.width = `${Math.max(0, Math.min(100, plan.progress_percent || 0))}%`;
+
+            const timer = timerSummary(plan);
+            const risk = riskSummary(plan);
+            document.getElementById('now').textContent = plan.next_action || '-';
+            document.getElementById('stepMeta').textContent = `Step ${plan.current_step}/${plan.total_steps} - ${plan.progress_percent || 0}%`;
+            document.getElementById('timer').textContent = timer.value ? `${timer.value} min` : 'none';
+            document.getElementById('timerBrief').textContent = timer.text;
+            document.getElementById('risk').textContent = risk.level;
+            document.getElementById('riskBrief').textContent = risk.text;
+            document.getElementById('ready').textContent = plan.pantry_readiness?.status || 'unknown';
+            document.getElementById('readyBrief').textContent = `${plan.confidence?.band || 'unknown'} - ${plan.stop_or_continue?.decision || 'unknown'}`;
+            document.getElementById('pills').innerHTML = [plan.cooking_method, plan.heat_level, plan.cook_mode?.mode, plan.serving_risk_window?.priority].filter(Boolean).map(item => `<span class="pill">${item}</span>`).join('');
+
+            list('checks', [...(plan.checkpoints || []).slice(0, 3), ...(plan.sensory_stop_signals || []).slice(0, 2)]);
+            list('plan', (plan.suggested_plan || []).slice(0, 7));
+            list('sources', sourceSummary(plan));
+            list('heat', [plan.heat_zone_plan?.action, ...(plan.doneness_escalation_path || []).slice(0, 3), plan.heat_recovery_plan?.action]);
+            list('serve', [plan.serving_risk_window?.action, plan.batch_hold_strategy?.guidance, ...(plan.tool_cleanup_order || []).slice(0, 2)]);
+            list('voice', [plan.voice_handoff_brief?.say_first, plan.voice_handoff_brief?.recovery, plan.voice_handoff_brief?.commands]);
+            setBusy(false);
+        }
+
+        async function planCook(command = null) {
+            const request = buildRequest(command);
+            const issues = validateRequest(request);
+            if (issues.length) {
+                alert(issues.join('\n'));
+                return;
+            }
+            lastRequest = request;
+            setBusy(true);
+            const response = await fetch('/api/v1/cook-pilot/plan', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(request)
+            });
+            const data = await response.json();
+            if (!response.ok) {
+                setBusy(false);
+                alert(data.detail || 'Cook Pilot failed.');
+                return;
+            }
+            renderPlan(data);
+        }
+
+        function commandCook(command) {
+            planCook(command);
+        }
+
+        async function saveSession() {
+            if (!lastPlan?.save_candidate) {
+                alert('Plan first.');
+                return;
+            }
+            const response = await fetch('/api/v1/capture', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(lastPlan.save_candidate)
+            });
+            document.getElementById('status').textContent = response.ok ? 'saved' : 'save failed';
+        }
+
+        async function copySummary() {
+            if (!lastPlan) return;
+            await navigator.clipboard.writeText(printableSummary(lastPlan));
+            document.getElementById('status').textContent = 'copied';
+        }
+
+        function saveDraft() {
+            localStorage.setItem('cookPilotStandaloneDraft', JSON.stringify(buildRequest(null)));
+            document.getElementById('status').textContent = 'draft saved';
+        }
+
+        function restoreDraft() {
+            const raw = localStorage.getItem('cookPilotStandaloneDraft');
+            if (!raw) return;
+            const draft = JSON.parse(raw);
+            document.getElementById('goal').value = draft.goal || 'cook_with_what_i_have';
+            document.getElementById('ingredients').value = (draft.available_ingredients || []).join(', ');
+            document.getElementById('avoid').value = (draft.avoid_ingredients || []).join(', ');
+            document.getElementById('diet').value = (draft.dietary_preferences || []).join(', ');
+            document.getElementById('equipment').value = (draft.equipment || []).join(', ');
+            document.getElementById('servings').value = draft.servings || '';
+            document.getElementById('minutes').value = draft.max_minutes || '';
+            document.getElementById('voiceInput').value = draft.voice_input || '';
+            document.getElementById('useSources').checked = draft.include_saved_sources !== false;
+            document.getElementById('status').textContent = 'draft restored';
+        }
+
+        document.addEventListener('keydown', event => {
+            if (event.target.matches('input, textarea')) return;
+            if (event.key === 'ArrowRight') commandCook('next');
+            if (event.key === 'ArrowLeft') commandCook('back');
+            if (event.key === 'Escape') commandCook('stop');
+        });
+    </script>
+</body>
+</html>

@@ -176,17 +176,57 @@
             border-color: #38bdf8;
         }
 
+        #recordsContainer {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 1.25rem;
+        }
         .record-card {
             background: #1e293b;
             border: 1px solid #334155;
             border-radius: 12px;
             padding: 1.25rem;
-            margin-bottom: 1.25rem;
             transition: all 0.2s;
             cursor: pointer;
             position: relative;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            overflow: hidden;
         }
-        .record-card:hover { border-color: #0284c7; box-shadow: 0 4px 15px rgba(2, 132, 199, 0.25); transform: translateY(-1px); }
+        .record-card:hover { border-color: #0284c7; box-shadow: 0 4px 15px rgba(2, 132, 199, 0.25); transform: translateY(-2px); }
+
+        .cover-image-box {
+            width: 100%;
+            height: 180px;
+            background: #0f172a;
+            border-radius: 8px;
+            overflow: hidden;
+            margin-bottom: 12px;
+            border: 1px solid #334155;
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .cover-image-box img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.25s ease;
+        }
+        .cover-image-box:hover img {
+            transform: scale(1.03);
+        }
+        .cover-image-box:hover .video-play-btn {
+            transform: translate(-50%, -50%) scale(1.15) !important;
+            background: #ef4444 !important;
+        }
+        .cover-placeholder {
+            text-align: center;
+            color: #64748b;
+            padding: 10px;
+        }
 
         .card-header {
             display: flex;
@@ -310,6 +350,117 @@
             margin-top: 1rem;
             display: none;
         }
+        .cook-pilot-box {
+            background: #111827;
+            border: 1px solid #475569;
+            border-radius: 8px;
+            padding: 14px;
+            margin-top: 1rem;
+        }
+        .cook-grid {
+            display: grid;
+            grid-template-columns: repeat(4, minmax(0, 1fr));
+            gap: 12px;
+            margin-bottom: 14px;
+        }
+        .cook-card {
+            background: #111827;
+            border: 1px solid #334155;
+            border-radius: 8px;
+            padding: 12px;
+            min-height: 104px;
+            overflow: hidden;
+        }
+        .cook-card strong {
+            display: block;
+            color: #bae6fd;
+            font-size: 0.78rem;
+            margin-bottom: 6px;
+            text-transform: uppercase;
+            letter-spacing: 0;
+        }
+        .cook-card .value {
+            color: #f8fafc;
+            font-size: 1rem;
+            font-weight: 800;
+            overflow-wrap: anywhere;
+        }
+        .cook-card .subvalue {
+            color: #94a3b8;
+            font-size: 0.82rem;
+            line-height: 1.4;
+            margin-top: 6px;
+            overflow-wrap: anywhere;
+        }
+        .cook-action-row {
+            display: grid;
+            grid-template-columns: repeat(4, minmax(0, 1fr));
+            gap: 8px;
+            margin: 12px 0;
+        }
+        .cook-action-row .btn {
+            width: 100%;
+            padding: 9px 10px;
+            border-radius: 8px;
+            font-size: 0.86rem;
+        }
+        .cook-lanes {
+            display: grid;
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+            gap: 12px;
+        }
+        .cook-lane {
+            background: #020617;
+            border: 1px solid #1e293b;
+            border-radius: 8px;
+            padding: 12px;
+            min-height: 150px;
+        }
+        .cook-lane h4 {
+            color: #38bdf8;
+            font-size: 0.92rem;
+            margin: 0 0 8px;
+        }
+        .cook-list {
+            margin: 0;
+            padding: 0 18px 0 0;
+            color: #dbeafe;
+            font-size: 0.86rem;
+            line-height: 1.55;
+        }
+        .cook-pill-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+            margin-top: 8px;
+        }
+        .cook-pill {
+            border: 1px solid #334155;
+            border-radius: 999px;
+            padding: 4px 9px;
+            color: #cbd5e1;
+            background: #0f172a;
+            font-size: 0.78rem;
+            font-weight: 700;
+        }
+        .cook-status-ready { border-color: #22c55e; color: #86efac; }
+        .cook-status-caution { border-color: #f59e0b; color: #fcd34d; }
+        .cook-status-risk { border-color: #ef4444; color: #fca5a5; }
+        .cook-empty {
+            color: #94a3b8;
+            border: 1px dashed #334155;
+            border-radius: 8px;
+            padding: 18px;
+            text-align: center;
+            background: #020617;
+        }
+        @media (max-width: 1100px) {
+            .cook-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+            .cook-lanes { grid-template-columns: 1fr; }
+        }
+        @media (max-width: 640px) {
+            .cook-grid, .cook-action-row { grid-template-columns: 1fr; }
+        }
     </style>
 </head>
 <body>
@@ -411,6 +562,71 @@
             <h3 class="panel-title"><span>🔨 הרכבת תוצר (Output Builder)</span></h3>
             <div class="form-group">
                 <label>סוג התוצר</label>
+            </div>
+
+                <div class="cook-pilot-box" id="cookPilotControls">
+                    <h3 class="panel-title"><span>Cook Pilot</span></h3>
+                    <div class="form-group">
+                        <label>Goal</label>
+                        <input type="text" id="cookGoal" class="form-control" value="cook_with_what_i_have">
+                    </div>
+                    <div class="form-group">
+                        <label>Available ingredients</label>
+                        <input type="text" id="cookIngredients" class="form-control" placeholder="carrot, ginger, onion">
+                    </div>
+                    <div class="form-group">
+                        <label>Avoid ingredients</label>
+                        <input type="text" id="cookAvoid" class="form-control" placeholder="peanut, dairy">
+                    </div>
+                    <div class="form-group">
+                        <label>Dietary preferences</label>
+                        <input type="text" id="cookDiet" class="form-control" placeholder="vegan, gluten-free">
+                    </div>
+                    <div class="form-group">
+                        <label>Equipment</label>
+                        <input type="text" id="cookEquipment" class="form-control" placeholder="pot, pan, oven">
+                    </div>
+                    <div style="display:grid; grid-template-columns:1fr 1fr; gap:8px;">
+                        <div class="form-group">
+                            <label>Servings</label>
+                            <input type="number" id="cookServings" class="form-control" min="1" placeholder="2">
+                        </div>
+                        <div class="form-group">
+                            <label>Minutes</label>
+                            <input type="number" id="cookMinutes" class="form-control" min="1" placeholder="30">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label>Voice prompt</label>
+                        <input type="text" id="cookVoiceInput" class="form-control" placeholder="I have tomato and rice, make something fast">
+                    </div>
+                    <label style="display:flex; gap:8px; align-items:center; color:#cbd5e1; font-size:0.86rem; margin-bottom:10px;">
+                        <input type="checkbox" id="cookUseSources" checked>
+                        Search saved culinary notes
+                    </label>
+                    <button onclick="handleCookPilotPlan()" class="btn btn-voice">Start Cook Pilot</button>
+                    <div class="cook-action-row">
+                        <button onclick="sendCookPilotCommand('next')" class="btn btn-ask">Next</button>
+                        <button onclick="sendCookPilotCommand('back')" class="btn btn-detail">Back</button>
+                        <button onclick="sendCookPilotCommand('repeat')" class="btn btn-detail">Repeat</button>
+                        <button onclick="sendCookPilotCommand('stop')" class="btn btn-record">Stop</button>
+                    </div>
+                    <div class="cook-action-row">
+                        <button onclick="saveCookPilotSession()" class="btn btn-build">Save</button>
+                        <button onclick="resetCookPilotSession()" class="btn btn-detail">Reset</button>
+                        <button onclick="printCookPilotSummary()" class="btn btn-detail">Print</button>
+                        <button onclick="fillCookPilotFromSelected()" class="btn btn-detail">Use Selected</button>
+                    </div>
+                    <div class="cook-action-row">
+                        <button onclick="copyCookPilotSummary()" class="btn btn-detail">Copy</button>
+                        <button onclick="persistCookPilotDraft()" class="btn btn-detail">Save Draft</button>
+                        <button onclick="restoreCookPilotDraft()" class="btn btn-detail">Restore</button>
+                        <button onclick="clearCookPilotDraft()" class="btn btn-detail">Clear Draft</button>
+                    </div>
+                </div>
+
+            <div class="form-group">
+                <label>×¡×•×’ ×”×ª×•×¦×¨</label>
                 <select id="outType" class="form-control">
                     <option value="post">פוסט לבלוג/רשתות (Post)</option>
                     <option value="guide">מדריך מעשי (Guide)</option>
@@ -444,7 +660,7 @@
             </div>
 
             <!-- SUB-TOPICS FILTER BAR -->
-            <div id="subTopicFilterContainer" style="margin-bottom:1.5rem; background:#0f172a; border:1px solid #1e293b; border-radius:12px; padding:12px 16px;">
+            <div id="subTopicFilterContainer" style="display:none; margin-bottom:1.5rem; background:#0f172a; border:1px solid #1e293b; border-radius:12px; padding:12px 16px;">
                 <div style="font-size:0.85rem; color:#94a3b8; font-weight:700; margin-bottom:8px; display:flex; align-items:center; gap:6px;">
                     <span>📌 סינון תצוגה לפי תת-נושא (Sub-Topic):</span>
                     <span id="activeSubTopicLabel" style="color:#38bdf8; font-weight:600;">(הכל)</span>
@@ -453,6 +669,70 @@
                     <!-- Dynamically rendered sub-topic filter pills -->
                 </div>
             </div>
+
+            <section class="cook-pilot-box" id="cookPilotCockpit">
+                <h3 class="panel-title">
+                    <span>Cook Pilot Cockpit</span>
+                    <span id="cookPilotStatus" class="cook-pill">idle</span>
+                </h3>
+                <div id="cookPilotEmpty" class="cook-empty">Start Cook Pilot from the side panel to see the live cooking cockpit.</div>
+                <div id="cookPilotResult" style="display:none;">
+                    <div style="height:10px; background:#020617; border:1px solid #334155; border-radius:999px; overflow:hidden; margin-bottom:14px;">
+                        <div id="cookProgressBar" style="height:100%; width:0%; background:#22c55e;"></div>
+                    </div>
+                    <div class="cook-grid">
+                        <div class="cook-card">
+                            <strong>Now</strong>
+                            <div class="value" id="cookNowAction">-</div>
+                            <div class="subvalue" id="cookStepMeta">-</div>
+                        </div>
+                        <div class="cook-card">
+                            <strong>Timer</strong>
+                            <div class="value" id="cookTimerValue">-</div>
+                            <div class="subvalue" id="cookTimerBrief">-</div>
+                        </div>
+                        <div class="cook-card">
+                            <strong>Risk</strong>
+                            <div class="value" id="cookRiskValue">-</div>
+                            <div class="subvalue" id="cookRiskBrief">-</div>
+                        </div>
+                        <div class="cook-card">
+                            <strong>Readiness</strong>
+                            <div class="value" id="cookReadinessValue">-</div>
+                            <div class="subvalue" id="cookReadinessBrief">-</div>
+                        </div>
+                    </div>
+                    <div class="cook-pill-row" id="cookPills"></div>
+                    <div class="cook-lanes">
+                        <div class="cook-lane">
+                            <h4>Checks</h4>
+                            <ul class="cook-list" id="cookChecks"></ul>
+                        </div>
+                        <div class="cook-lane">
+                            <h4>Plan</h4>
+                            <ul class="cook-list" id="cookPlan"></ul>
+                        </div>
+                        <div class="cook-lane">
+                            <h4>Source and Memory</h4>
+                            <ul class="cook-list" id="cookMemory"></ul>
+                        </div>
+                    </div>
+                    <div class="cook-lanes" style="margin-top:12px;">
+                        <div class="cook-lane">
+                            <h4>Heat and Doneness</h4>
+                            <ul class="cook-list" id="cookHeat"></ul>
+                        </div>
+                        <div class="cook-lane">
+                            <h4>Serving and Cleanup</h4>
+                            <ul class="cook-list" id="cookServing"></ul>
+                        </div>
+                        <div class="cook-lane">
+                            <h4>Voice</h4>
+                            <ul class="cook-list" id="cookVoice"></ul>
+                        </div>
+                    </div>
+                </div>
+            </section>
 
             <div id="recordsContainer">
                 <p style="color:#94a3b8;">טוען תכנים מתוך המאגר...</p>
@@ -475,6 +755,31 @@
         </div>
     </div>
 
+    <!-- EDIT RECORD MODAL -->
+    <div class="modal-overlay" id="editModal">
+        <div class="modal-card" style="max-width: 620px;">
+            <button class="modal-close" onclick="closeEditModal()">✕</button>
+            <h3 style="color:#38bdf8; margin-top:0; font-size:1.3rem;">✏️ עריכת פריט</h3>
+            <input type="hidden" id="editRecordId">
+            <div class="form-group" style="margin-bottom:12px;">
+                <label style="color:#94a3b8; font-size:0.85rem; font-weight:bold; display:block; margin-bottom:4px;">כותרת הפריט:</label>
+                <input type="text" id="editTitle" class="form-control" style="width:100%;">
+            </div>
+            <div class="form-group" style="margin-bottom:12px;">
+                <label style="color:#94a3b8; font-size:0.85rem; font-weight:bold; display:block; margin-bottom:4px;">תקציר / תיאור קצר:</label>
+                <textarea id="editSummary" class="form-control" rows="3" style="width:100%; resize:vertical;"></textarea>
+            </div>
+            <div class="form-group" style="margin-bottom:16px;">
+                <label style="color:#94a3b8; font-size:0.85rem; font-weight:bold; display:block; margin-bottom:4px;">תוכן מלא / תמליל / הערות:</label>
+                <textarea id="editTranscript" class="form-control" rows="6" style="width:100%; resize:vertical;"></textarea>
+            </div>
+            <div style="display:flex; justify-content:space-between; align-items:center; gap:10px;">
+                <button onclick="saveRecordEdit()" class="btn btn-capture" style="background:#0284c7; flex:1; padding:10px; font-weight:bold;">💾 שמור שינויים וסנכרן</button>
+                <button onclick="closeEditModal()" style="background:#334155; color:#cbd5e1; border:none; border-radius:8px; padding:10px 16px; cursor:pointer;">ביטול</button>
+            </div>
+        </div>
+    </div>
+
     <script>
         let currentDomain = 'all';
         let currentSubTopic = 'all';
@@ -482,6 +787,248 @@
         let currentRecords = [];
         let domainConfig = {};
         let subTopicLabelsMap = {};
+        let cookPilotLastRequest = null;
+        let cookPilotLastPlan = null;
+        let cookPilotKeyboardEnabled = true;
+
+        function safeParse(val, fallback) {
+            if (val === null || val === undefined || val === '') return fallback;
+            if (typeof val === 'object') return val;
+            try {
+                return JSON.parse(val);
+            } catch (e) {
+                try {
+                    return JSON.parse(String(val).replace(/'/g, '"'));
+                } catch (e2) {
+                    return fallback;
+                }
+            }
+        }
+
+        function getSourceIcon(type) {
+            switch (type) {
+                case 'video': return '🎥';
+                case 'podcast': return '🎙️';
+                case 'article': return '📰';
+                case 'infographic': return '📊';
+                default: return '📝';
+            }
+        }
+
+        function getParsedSourceUrls(sourceUrl) {
+            if (!sourceUrl) return [];
+            if (Array.isArray(sourceUrl)) return sourceUrl.filter(Boolean);
+            try {
+                const parsed = JSON.parse(sourceUrl);
+                if (Array.isArray(parsed)) return parsed.filter(Boolean);
+                if (typeof parsed === 'string' && parsed.trim()) return [parsed.trim()];
+            } catch (e) {
+                try {
+                    const parsed = JSON.parse(String(sourceUrl).replace(/'/g, '"'));
+                    if (Array.isArray(parsed)) return parsed.filter(Boolean);
+                } catch (e2) {}
+            }
+            const trimmed = String(sourceUrl).trim();
+            return trimmed ? [trimmed] : [];
+        }
+
+        function getYouTubeVideoId(url) {
+            if (!url || typeof url !== 'string') return null;
+            const match = url.match(/(?:youtube\.com\/(?:[^\/]+\/.+\/|(?:v|e(?:mbed)?|shorts)\/|.*[?&]v=)|youtu\.be\/)([\w-]{11})/i);
+            return match ? match[1] : null;
+        }
+
+        function isVideoRecord(r) {
+            if (!r) return false;
+            if (r.source_type === 'video') return true;
+            const urls = getParsedSourceUrls(r.source_url);
+            return urls.some(u => typeof u === 'string' && /(?:youtube\.com|youtu\.be|vimeo\.com|\.mp4)/i.test(u));
+        }
+
+        function getWebPageUrl(r) {
+            if (!r) return null;
+            const urls = getParsedSourceUrls(r.source_url);
+            for (const u of urls) {
+                if (typeof u === 'string' && /^https?:\/\//i.test(u)) {
+                    if (!/(?:youtube\.com|youtu\.be|vimeo\.com|\.mp4)/i.test(u)) {
+                        return u;
+                    }
+                }
+            }
+            return null;
+        }
+
+        function getCoverImageUrl(r) {
+            if (!r || !r.source_url) return null;
+            const urls = getParsedSourceUrls(r.source_url);
+
+            // 1. If there's a video (YouTube), automatically use the screen shown when browsing it!
+            for (const u of urls) {
+                if (typeof u === 'string') {
+                    const ytId = getYouTubeVideoId(u);
+                    if (ytId) {
+                        return `https://img.youtube.com/vi/${ytId}/hqdefault.jpg`;
+                    }
+                }
+            }
+
+            // 2. Otherwise check for uploaded image or static image file
+            const imgUrl = urls.find(u => typeof u === 'string' && (u.startsWith('/data/uploads/') || /\.(jpg|jpeg|png|webp|gif)$/i.test(u)));
+            if (imgUrl) return imgUrl;
+
+            // 3. Web page / Article URL -> return live screenshot of the web page!
+            const webUrl = getWebPageUrl(r);
+            if (webUrl) {
+                return `https://api.microlink.io/?url=${encodeURIComponent(webUrl)}&screenshot=true&meta=false&embed=screenshot.url`;
+            }
+
+            return null;
+        }
+
+        function getYouTubeEmbedURL(url) {
+            if (!url || typeof url !== 'string') return null;
+            const vidId = getYouTubeVideoId(url);
+            return vidId ? `https://www.youtube.com/embed/${vidId}` : null;
+        }
+
+        function playVideoFromCard(id, element) {
+            const r = currentRecords.find(item => String(item.id) === String(id));
+            if (!r) return;
+            const urls = getParsedSourceUrls(r.source_url);
+            
+            let ytId = null;
+            let otherVideoUrl = null;
+            for (const u of urls) {
+                if (typeof u === 'string') {
+                    const matchedId = getYouTubeVideoId(u);
+                    if (matchedId) {
+                        ytId = matchedId;
+                        break;
+                    }
+                    if (/facebook\.com|vimeo\.com|\.mp4/i.test(u)) {
+                        otherVideoUrl = u;
+                    }
+                }
+            }
+
+            if (ytId) {
+                element.innerHTML = `
+                    <iframe 
+                        src="https://www.youtube.com/embed/${ytId}?autoplay=1&rel=0" 
+                        style="width:100%; height:100%; border:0; border-radius:8px;" 
+                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
+                        allowfullscreen>
+                    </iframe>
+                `;
+                element.style.background = '#000';
+                element.style.cursor = 'default';
+                element.removeAttribute('title');
+                element.onclick = (e) => e.stopPropagation();
+            } else if (otherVideoUrl) {
+                window.open(otherVideoUrl, '_blank');
+            } else {
+                openDetailModal(id);
+            }
+        }
+
+        function renderCardSourceLink(r) {
+            const urls = getParsedSourceUrls(r.source_url);
+            if (!urls.length) return '';
+            
+            const webLinks = urls.filter(u => typeof u === 'string' && /^https?:\/\//i.test(u));
+
+            if (webLinks.length > 0) {
+                const u = webLinks[0];
+                const isYoutube = /(?:youtube\.com|youtu\.be)/i.test(u);
+                const isFb = /facebook\.com/i.test(u);
+                const icon = isYoutube ? '🎬' : (isFb ? '📱' : '🔗');
+                const label = isYoutube ? 'צפה ביוטיוב ↗' : (isFb ? 'צפה בפייסבוק ↗' : 'פתח מקור ↗');
+                return `<span style="color:#06b6d4;">${icon} <a href="${u}" target="_blank" rel="noopener noreferrer" onclick="event.stopPropagation()" style="color:#06b6d4; font-weight:bold; text-decoration:underline;">${label}</a></span>`;
+            }
+
+            return '';
+        }
+
+        function renderModalSourceViewer(r) {
+            const urls = getParsedSourceUrls(r.source_url);
+            if (!urls.length) return '';
+
+            let html = `<div style="background:#020617; border:1px solid #1e293b; border-radius:8px; padding:12px; margin-top:10px; margin-bottom:12px;">`;
+            html += `<div style="color:#38bdf8; font-weight:bold; margin-bottom:8px; font-size:0.95rem;">🎬 מקורות תוכן וקישורים:</div>`;
+
+            let youtubeEmbedHtml = '';
+
+            urls.forEach((u, idx) => {
+                const isYoutube = /(?:youtube\.com|youtu\.be)/i.test(u);
+                const ytEmbed = getYouTubeEmbedURL(u);
+                if (ytEmbed && !youtubeEmbedHtml) {
+                    youtubeEmbedHtml = `
+                        <div style="margin-top:10px; margin-bottom:10px; position:relative; padding-bottom:56.25%; height:0; overflow:hidden; border-radius:8px; border:1px solid #0284c7;">
+                            <iframe src="${ytEmbed}" style="position:absolute; top:0; left:0; width:100%; height:100%; border:0;" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+                        </div>
+                    `;
+                }
+
+                const isFb = /facebook\.com/i.test(u);
+                const isImg = u.startsWith('/data/uploads/') || /\.(jpg|jpeg|png|webp|gif)$/i.test(u);
+                const icon = isYoutube ? '🎥' : (isFb ? '📱' : (isImg ? '🖼️' : '🌐'));
+                const displayLabel = urls.length > 1 ? `קובץ / מקור ${idx + 1}` : 'פתח מקור מקורי';
+
+                html += `
+                    <div style="margin-bottom:6px; font-size:0.9rem;">
+                        ${icon} <a href="${u}" target="_blank" rel="noopener noreferrer" style="color:#06b6d4; font-weight:bold; text-decoration:underline;">
+                            ${displayLabel}: ${u} ↗
+                        </a>
+                    </div>
+                `;
+            });
+
+            if (youtubeEmbedHtml) {
+                html += youtubeEmbedHtml;
+            } else {
+                const webUrl = getWebPageUrl(r);
+                if (webUrl) {
+                    html += `
+                        <div style="margin-top:10px; border-radius:8px; overflow:hidden; border:1px solid #0284c7; background:#000;">
+                            <a href="${webUrl}" target="_blank" rel="noopener noreferrer" title="לחץ לפתיחת האתר בחלון חדש">
+                                <img src="https://api.microlink.io/?url=${encodeURIComponent(webUrl)}&screenshot=true&meta=false&embed=screenshot.url" 
+                                     alt="צילום מסך של דף הרשת" 
+                                     style="width:100%; max-height:360px; object-fit:cover; display:block;"
+                                     onerror="if(!this.dataset.fallback){this.dataset.fallback=1; this.src='https://image.thum.io/get/width/650/crop/400/${encodeURI(webUrl)}';}">
+                            </a>
+                            <div style="padding:6px 10px; background:#0f172a; font-size:0.8rem; color:#38bdf8; text-align:left; direction:ltr;">
+                                🌐 ${webUrl} (לחץ על התמונה לפתיחה בחלון חדש ↗)
+                            </div>
+                        </div>
+                    `;
+                }
+            }
+
+            html += `</div>`;
+            return html;
+        }
+
+        async function uploadCoverImage(recordId, file) {
+            if (!file) return;
+            const formData = new FormData();
+            formData.append('file', file);
+            try {
+                const res = await fetch(`/api/v1/records/${recordId}/cover-image`, {
+                    method: 'POST',
+                    body: formData
+                });
+                const data = await res.json();
+                if (res.ok) {
+                    closeModal();
+                    fetchRecords();
+                } else {
+                    alert('❌ שגיאה בהעלאת תמונת שער: ' + (data.detail || 'שגיאה'));
+                }
+            } catch (err) {
+                console.error("Error uploading cover image:", err);
+                alert('❌ שגיאה בתקשורת עם השרת');
+            }
+        }
 
         async function loadDomainConfig() {
             try {
@@ -616,14 +1163,15 @@
                 }
 
                 container.innerHTML = currentRecords.map((r) => {
-                    const keywords = JSON.parse(r.keywords_json || '[]');
-                    const customTags = JSON.parse(r.custom_tags_json || '[]');
-                    const domainData = JSON.parse(r.domain_data_json || '{}');
-                    const subTopics = JSON.parse(r.sub_topics_json || '[]');
+                    const keywords = safeParse(r.keywords_json, []);
+                    const customTags = safeParse(r.custom_tags_json, []);
+                    const domainData = safeParse(r.domain_data_json, {});
+                    const subTopicsRaw = safeParse(r.sub_topics_json, []);
+                    const subTopics = Array.isArray(subTopicsRaw) ? subTopicsRaw : [subTopicsRaw];
                     const isChecked = selectedRecordIds.has(r.id) ? 'checked' : '';
 
-                    let domainsList = JSON.parse(r.domains_json || '[]');
-                    if (!domainsList.length) domainsList = [r.primary_domain || 'general'];
+                    let domainsList = safeParse(r.domains_json, []);
+                    if (!Array.isArray(domainsList) || !domainsList.length) domainsList = [r.primary_domain || 'general'];
                     const badgesHTML = domainsList.map(d => {
                         const icon = domainConfig[d]?.icon || '';
                         return `<span class="badge badge-${d}" style="margin-left:4px;">${icon} ${d.toUpperCase()}</span>`;
@@ -638,67 +1186,105 @@
                         return `<span style="background:rgba(236, 72, 153, 0.15); border:1px solid rgba(236, 72, 153, 0.4); padding:2px 8px; border-radius:12px; font-size:0.75rem; margin-left:4px; color:#f472b6;">🔖 #${ct}</span>`;
                     }).join('');
 
-                    let domainMetaHTML = '';
-                    if (r.primary_domain === 'hair' && domainData.problem_type) {
-                        domainMetaHTML = `<div class="domain-meta-box"><b>בעיה:</b> ${domainData.problem_type} | <b>שיטה:</b> ${domainData.method_name || 'כללי'} | <b>רכיבים:</b> ${(domainData.active_ingredients || []).join(', ')}</div>`;
-                    } else if (r.primary_domain === 'culinary' && domainData.dish_type) {
-                        domainMetaHTML = `<div class="domain-meta-box"><b>סוג מנה:</b> ${domainData.dish_type} | <b>רכיבים:</b> ${(domainData.ingredients || []).join(', ')} | <b>טכניקה:</b> ${domainData.technique || ''}</div>`;
-                    } else if (r.primary_domain === 'health' && domainData.condition) {
-                        domainMetaHTML = `<div class="domain-meta-box"><b>מצב רפואי:</b> ${domainData.condition} | <b>מערכת גוף:</b> ${domainData.body_system || ''} | <b>רמת ראיות:</b> ${domainData.evidence_level || ''}</div>`;
-                    } else if (r.primary_domain === 'foraging' && domainData.risk_assessment) {
-                        domainMetaHTML = `<div class="domain-meta-box"><b>אזור:</b> ${domainData.region || ''} | <b>חלקים שמישים:</b> ${(domainData.usable_parts || []).join(', ')}</div>`;
-                    } else if (r.primary_domain === 'mental' && (domainData.practice_type || domainData.emotional_state)) {
-                        domainMetaHTML = `<div class="domain-meta-box"><b>סוג תרגול:</b> ${domainData.practice_type || 'כללי'} | <b>מצב רגשי:</b> ${domainData.emotional_state || ''} | <b>טכניקה:</b> ${domainData.cognitive_technique || ''}</div>`;
-                    } else if (r.primary_domain === 'financial' && (domainData.asset_class || domainData.financial_goal)) {
-                        domainMetaHTML = `<div class="domain-meta-box"><b>אפיק:</b> ${domainData.asset_class || 'כללי'} | <b>יעד פיננסי:</b> ${domainData.financial_goal || ''} | <b>פרופיל סיכון:</b> ${domainData.risk_profile || ''}</div>`;
-                    }
+                    const isVideo = isVideoRecord(r);
+                    const webUrl = getWebPageUrl(r);
+                    const isWebPage = !isVideo && !!webUrl;
+                    const coverUrl = getCoverImageUrl(r);
+                    let coverHeaderHTML = '';
+                    if (coverUrl) {
+                        let clickHandler = '';
+                        let tooltip = r.title;
+                        let badgeOverlay = '';
 
-                    const imageHTML = renderImageGallery(r, false);
+                        if (isVideo) {
+                            clickHandler = `onclick="event.stopPropagation(); playVideoFromCard('${r.id}', this)"`;
+                            tooltip = '▶ לחץ להפעלת הסרטון מיד כאן בתא';
+                            badgeOverlay = `
+                                <div class="video-play-btn" style="position:absolute; top:50%; left:50%; transform:translate(-50%, -50%); background:rgba(220, 38, 38, 0.9); border:2px solid #ffffff; border-radius:50%; width:48px; height:48px; display:flex; align-items:center; justify-content:center; color:#fff; font-size:1.3rem; box-shadow:0 4px 16px rgba(0,0,0,0.7); pointer-events:none; transition:transform 0.2s;">
+                                    ▶
+                                </div>
+                                <div style="position:absolute; bottom:8px; right:8px; background:rgba(15,23,42,0.9); color:#38bdf8; font-size:0.72rem; font-weight:bold; padding:2px 8px; border-radius:4px; border:1px solid rgba(56,189,248,0.4);">
+                                    🎥 לחץ לנגינה
+                                </div>
+                            `;
+                        } else if (isWebPage) {
+                            clickHandler = `onclick="event.stopPropagation(); window.open('${webUrl}', '_blank')"`;
+                            tooltip = `🌐 לחץ לצפייה בדף המקורי ברשת: ${webUrl}`;
+                            badgeOverlay = `
+                                <div style="position:absolute; bottom:8px; right:8px; background:rgba(15,23,42,0.9); color:#38bdf8; font-size:0.72rem; font-weight:bold; padding:2px 8px; border-radius:4px; border:1px solid rgba(56,189,248,0.4); display:flex; align-items:center; gap:4px;">
+                                    🌐 דף ברשת ↗
+                                </div>
+                            `;
+                        } else {
+                            clickHandler = `onclick="event.stopPropagation(); openDetailModal('${r.id}')"`;
+                        }
+
+                        const fallbackAttr = isWebPage ? `onerror="if(!this.dataset.fallback){this.dataset.fallback=1; this.src='https://image.thum.io/get/width/650/crop/400/${encodeURI(webUrl)}';}"` : '';
+
+                        coverHeaderHTML = `
+                            <div class="cover-image-box" ${clickHandler} style="position:relative; cursor:pointer;" title="${tooltip}">
+                                <img src="${coverUrl}" alt="${r.title}" loading="lazy" ${fallbackAttr}>
+                                ${badgeOverlay}
+                            </div>
+                        `;
+                    } else {
+                        coverHeaderHTML = `
+                            <div class="cover-image-box" onclick="event.stopPropagation()">
+                                <div class="cover-placeholder">
+                                    <div style="font-size:2.2rem; margin-bottom:4px;">${getSourceIcon(r.source_type)}</div>
+                                    <label style="font-size:0.75rem; background:#0284c7; color:#fff; padding:4px 10px; border-radius:6px; cursor:pointer; font-weight:bold; display:inline-block;">
+                                        📸 הוסף תמונת שער
+                                        <input type="file" accept="image/*" style="display:none;" onchange="uploadCoverImage('${r.id}', this.files[0])">
+                                    </label>
+                                </div>
+                            </div>
+                        `;
+                    }
 
                     return `
                         <div class="record-card" onclick="openDetailModal('${r.id}')">
-                            ${r.risk_level === 'high' ? `<div class="risk-banner">⚠️ <b>אזהרת בטיחות וסיכון גבוה:</b> יש להפעיל שיקול דעת ולקבל ייעוץ מקצועי לפני שימוש.</div>` : ''}
+                            ${coverHeaderHTML}
+
+                            ${r.risk_level === 'high' ? `<div class="risk-banner">⚠️ <b>רמת סיכון גבוהה</b></div>` : ''}
                             
                             <div class="card-header">
                                 <div class="card-title-box">
                                     <input type="checkbox" onclick="event.stopPropagation()" onchange="toggleSelect('${r.id}')" ${isChecked} style="width:18px; height:18px; cursor:pointer;">
                                     <h4 class="card-title">${r.title}</h4>
                                 </div>
-                                <div>${badgesHTML}</div>
-                            </div>
-
-                            <p style="color:#cbd5e1; font-size:0.95rem; margin:0 0 10px 0;">${r.summary || r.transcript || ''}</p>
-                            
-                            ${imageHTML}
-
-                            ${(subTopicsHTML || customTagsHTML) ? `<div style="margin-top:8px; margin-bottom:8px; display:flex; flex-wrap:wrap; gap:4px;">${subTopicsHTML}${customTagsHTML}</div>` : ''}
-
-                            ${domainMetaHTML}
-
-                            <div style="font-size:0.8rem; color:#94a3b8; display:flex; gap:12px; flex-wrap:wrap; margin-top:10px; align-items:center;">
-                                <span>📅 ${r.capture_date}</span>
-                                <span>סוג: <b>${r.source_type}</b></span>
-                                ${r.source_url ? `<span style="color:#06b6d4;">🎬 <a href="${r.source_url}" target="_blank" onclick="event.stopPropagation()" style="color:#06b6d4; font-weight:bold; text-decoration:underline;">צפה בסרטון / פתח קישור ↗</a></span>` : ''}
-                                <span>סטטוס: <b>${r.status}</b></span>
-                                <span>אמינות: <b>${r.reliability_layer}</b></span>
-                            </div>
-                            
-                            ${keywords.length ? `<div style="margin-top:8px;"><b style="font-size:0.78rem; color:#94a3b8;">🔑 מילות מפתח שנשאבו: </b>${keywords.map(k=>`<span style="background:#0f172a; padding:2px 6px; border-radius:4px; font-size:0.75rem; margin-left:4px; color:#38bdf8;">#${k}</span>`).join('')}</div>`:''}
-
-                            <button class="btn-detail" onclick="event.stopPropagation(); toggleInlineCollapsible('${r.id}')">📖 הצג / הסתר תוכן מלא ותמליל בלחיצה</button>
-
-                            <div class="collapsible-body" id="collab-${r.id}" onclick="event.stopPropagation()">
-                                <h5 style="color:#38bdf8; margin:0 0 8px 0;">📝 תמליל ותוכן מלא:</h5>
-                                <p style="font-size:0.9rem; color:#e2e8f0; line-height:1.6; margin:0;">${r.transcript || 'אין תמליל מפורט'}</p>
-                                <div style="margin-top:10px; font-size:0.8rem; color:#a855f7;">
-                                    🔗 <b>קישור ל-Vault:</b> vault/02 By Domain/${r.primary_domain.toUpperCase()}/${r.title.replace(/\s+/g, '_')}_${r.id.substring(0,8)}.md
+                                <div style="display:flex; align-items:center; gap:6px;">
+                                    <div>${badgesHTML}</div>
                                 </div>
+                            </div>
+
+                            ${(() => {
+                                let desc = r.summary || r.transcript || '';
+                                if (desc.startsWith('קבצי אינפוגרפיקה הועלו:') || desc.startsWith('אינפוגרפיקות הועלו:')) desc = '';
+                                return desc ? `<p style="color:#cbd5e1; font-size:0.88rem; margin:0 0 10px 0; display:-webkit-box; -webkit-line-clamp:3; -webkit-box-orient:vertical; overflow:hidden;">${desc}</p>` : '';
+                            })()}
+
+                            ${(subTopicsHTML || customTagsHTML) ? `<div style="margin-top:6px; margin-bottom:6px; display:flex; flex-wrap:wrap; gap:4px;">${subTopicsHTML}${customTagsHTML}</div>` : ''}
+
+                            <div style="font-size:0.78rem; color:#94a3b8; display:flex; gap:8px; flex-wrap:wrap; margin-top:10px; align-items:center;">
+                                <span>📅 ${r.capture_date}</span>
+                                <span>סוג: <b>${getSourceIcon(r.source_type)} ${r.source_type}</b></span>
+                                ${renderCardSourceLink(r)}
+                            </div>
+                            
+                            <div style="display:flex; gap:6px; margin-top:10px;">
+                                <button class="btn-detail" onclick="event.stopPropagation(); openDetailModal('${r.id}')" style="flex:1; text-align:center; margin:0; padding:6px 8px; font-size:0.85rem;">👁️ פתח</button>
+                                <button onclick="event.stopPropagation(); openEditModal('${r.id}')" style="background:rgba(56, 189, 248, 0.12); border:1px solid rgba(56, 189, 248, 0.4); color:#38bdf8; border-radius:6px; padding:6px 12px; cursor:pointer; font-weight:bold; font-size:0.82rem; white-space:nowrap; display:flex; align-items:center; gap:4px;" onmouseover="this.style.background='#0284c7'; this.style.color='#fff';" onmouseout="this.style.background='rgba(56, 189, 248, 0.12)'; this.style.color='#38bdf8';" title="ערוך טקסט ופרטים">✏️ ערוך</button>
+                                <button onclick="event.stopPropagation(); deleteRecord('${r.id}')" style="background:rgba(239, 68, 68, 0.12); border:1px solid rgba(239, 68, 68, 0.4); color:#f87171; border-radius:6px; padding:6px 12px; cursor:pointer; font-weight:bold; font-size:0.82rem; white-space:nowrap; display:flex; align-items:center; gap:4px;" onmouseover="this.style.background='#ef4444'; this.style.color='#fff';" onmouseout="this.style.background='rgba(239, 68, 68, 0.12)'; this.style.color='#f87171';" title="מחק פריט זה">🗑️ מחק</button>
                             </div>
                         </div>
                     `;
                 }).join('');
             } catch (err) {
                 console.error("Error fetching records:", err);
+                const container = document.getElementById('recordsContainer');
+                if (container) {
+                    container.innerHTML = `<p style="color:#ef4444; background:rgba(239,68,68,0.1); padding:15px; border-radius:8px; border:1px solid #ef4444;">❌ שגיאה בטעינת התכנים מהשרת: ${err.message}</p>`;
+                }
             }
         }
 
@@ -734,23 +1320,16 @@
         }
 
         function renderImageGallery(r, isModal = false) {
-            if (!r.source_url) return '';
-            let urls = [];
-            try {
-                const parsed = JSON.parse(r.source_url);
-                if (Array.isArray(parsed)) urls = parsed;
-                else urls = [r.source_url];
-            } catch (e) {
-                urls = [r.source_url];
-            }
+            const urls = getParsedSourceUrls(r.source_url);
+            if (!urls.length) return '';
 
             const isMedia = r.source_type === 'infographic' || urls.some(u => typeof u === 'string' && (u.startsWith('/data/uploads/') || /\.(jpg|jpeg|png|webp|gif)$/i.test(u)));
             if (!isMedia) return '';
 
             const maxH = isModal ? '450px' : '220px';
-            const imgsHTML = urls.map(u => `<img src="${u}" alt="${r.title}" style="max-width:100%; max-height:${maxH}; border-radius:8px; border:1px solid #0284c7; object-fit:contain;">`).join('');
+            const imgsHTML = urls.map(u => `<a href="${u}" target="_blank" rel="noopener noreferrer" onclick="event.stopPropagation()"><img src="${u}" alt="${r.title}" style="max-width:100%; max-height:${maxH}; border-radius:8px; border:1px solid #0284c7; object-fit:contain; cursor:pointer;" title="לחץ להצגה מלאה של הקובץ"></a>`).join('');
             
-            const countBadge = urls.length > 1 ? `<div style="font-size:0.8rem; color:#38bdf8; margin-bottom:6px; font-weight:bold;">📊 גלריית אינפוגרפיקות (${urls.length} תמונות בפריט):</div>` : '';
+            const countBadge = urls.length > 1 ? `<div style="font-size:0.8rem; color:#38bdf8; margin-bottom:6px; font-weight:bold;">📊 גלריית אינפוגרפיקות (${urls.length} תמונות בפריט - לחץ על תמונה להגדלה):</div>` : '';
 
             return `<div style="margin-top:10px; text-align:center; background:#020617; padding:10px; border-radius:8px; border:1px solid #1e293b;">
                 ${countBadge}
@@ -785,28 +1364,31 @@
         }
 
         function renderSubTopicFilterBar() {
+            const filterContainer = document.getElementById('subTopicFilterContainer');
             const container = document.getElementById('subTopicFilterButtons');
             const activeLabel = document.getElementById('activeSubTopicLabel');
             if (!container) return;
 
-            let subTopicsToRender = {};
+            // תתי-הנושאים יוצגו רק תחת הנושא שנבחר ולא תחת 'הכל'
             if (currentDomain === 'all') {
-                for (const [dKey, dInfo] of Object.entries(domainConfig)) {
-                    const subs = dInfo.sub_topics || {};
-                    for (const [sKey, sInfo] of Object.entries(subs)) {
-                        subTopicsToRender[sKey] = sInfo;
-                    }
-                }
-            } else {
-                const dInfo = domainConfig[currentDomain];
-                if (dInfo && dInfo.sub_topics) {
-                    subTopicsToRender = dInfo.sub_topics;
-                }
+                if (filterContainer) filterContainer.style.display = 'none';
+                return;
             }
 
-            let pillsHTML = `<button class="tab-btn ${currentSubTopic === 'all' ? 'active' : ''}" style="font-size:0.8rem; padding:4px 12px; border-radius:14px;" onclick="filterSubTopic('all', this)">🌐 הכל</button>`;
+            const dInfo = domainConfig[currentDomain];
+            const subTopicsToRender = (dInfo && dInfo.sub_topics) ? dInfo.sub_topics : {};
+            const subEntries = Object.entries(subTopicsToRender);
+
+            if (subEntries.length === 0) {
+                if (filterContainer) filterContainer.style.display = 'none';
+                return;
+            }
+
+            if (filterContainer) filterContainer.style.display = 'block';
+
+            let pillsHTML = `<button class="tab-btn ${currentSubTopic === 'all' ? 'active' : ''}" style="font-size:0.8rem; padding:4px 12px; border-radius:14px;" onclick="filterSubTopic('all', this)">🌐 הכל ב-${dInfo.label_he || currentDomain}</button>`;
             
-            for (const [sKey, sInfo] of Object.entries(subTopicsToRender)) {
+            for (const [sKey, sInfo] of subEntries) {
                 const isActive = currentSubTopic === sKey ? 'active' : '';
                 const label = sInfo.label_he || sKey;
                 pillsHTML += `<button class="tab-btn ${isActive}" style="font-size:0.8rem; padding:4px 12px; border-radius:14px;" onclick="filterSubTopic('${sKey}', this)">📌 ${label}</button>`;
@@ -851,13 +1433,14 @@
             const r = currentRecords.find(item => String(item.id) === String(id));
             if (!r) return;
 
-            const keywords = JSON.parse(r.keywords_json || '[]');
-            const customTags = JSON.parse(r.custom_tags_json || '[]');
-            const domainData = JSON.parse(r.domain_data_json || '{}');
-            const subTopics = JSON.parse(r.sub_topics_json || '[]');
+            const keywords = safeParse(r.keywords_json, []);
+            const customTags = safeParse(r.custom_tags_json, []);
+            const domainData = safeParse(r.domain_data_json, {});
+            const subTopicsRaw = safeParse(r.sub_topics_json, []);
+            const subTopics = Array.isArray(subTopicsRaw) ? subTopicsRaw : [subTopicsRaw];
 
-            let domainsList = JSON.parse(r.domains_json || '[]');
-            if (!domainsList.length) domainsList = [r.primary_domain || 'general'];
+            let domainsList = safeParse(r.domains_json, []);
+            if (!Array.isArray(domainsList) || !domainsList.length) domainsList = [r.primary_domain || 'general'];
 
             const subTopicsLabels = subTopics.map(st => subTopicLabelsMap[st] || st).join(', ');
 
@@ -866,7 +1449,7 @@
             document.getElementById('modalContent').innerHTML = `
                 <h2 style="color:#38bdf8; margin-top:0;">${r.title}</h2>
                 <p style="color:#94a3b8; font-size:0.85rem;">תחומים: <b>${domainsList.map(d => d.toUpperCase()).join(', ')}</b> | סוג מקור: <b>${r.source_type}</b> | אמינות: <b>${r.reliability_layer}</b></p>
-                ${r.source_url ? `<p style="color:#06b6d4; font-size:0.9rem;">🎬 <b>קישור / קובץ:</b> <a href="${r.source_url}" target="_blank" style="color:#06b6d4; font-weight:bold;">${r.source_url} ↗</a></p>` : ''}
+                ${renderModalSourceViewer(r)}
                 ${imageGalleryHTML}
                 ${subTopicsLabels ? `<p style="color:#38bdf8; font-size:0.85rem;">📌 תתי-נושאים: <b>${subTopicsLabels}</b></p>` : ''}
                 ${customTags.length ? `<p style="color:#f472b6; font-size:0.85rem;">🔖 תגים אישיים: <b>${customTags.map(t=>`#${t}`).join(', ')}</b></p>` : ''}
@@ -885,8 +1468,12 @@
                 <h3 style="color:#22c55e; font-size:1.1rem; margin-top:1.5rem;">🧬 שדות תחום מובנים</h3>
                 <pre style="background:#020617; padding:0.75rem; border-radius:8px; font-size:0.85rem; color:#38bdf8;">${JSON.stringify(domainData, null, 2)}</pre>
 
-                <div style="margin-top:1.5rem; text-align:left;">
-                    <a href="/vault/" target="_blank" style="color:#38bdf8; text-decoration:none; font-weight:bold;">📂 פתח קובץ Markdown ב-Obsidian Vault ↗</a>
+                <div style="margin-top:1.5rem; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px;">
+                    <a href="/api/v1/records/${r.id}/markdown" target="_blank" style="color:#38bdf8; text-decoration:none; font-weight:bold; background:#0f172a; border:1px solid #0284c7; padding:6px 12px; border-radius:6px; display:inline-block;">📂 צפה בקובץ ה-Markdown של הפריט (סנכרון Obsidian) ↗</a>
+                    <div style="display:flex; gap:8px;">
+                        <button onclick="openEditModal('${r.id}', true)" style="background:#0284c7; color:#fff; border:none; padding:6px 14px; border-radius:6px; cursor:pointer; font-weight:bold; font-size:0.85rem;">✏️ ערוך פרטים</button>
+                        <button onclick="deleteRecord('${r.id}', true)" style="background:rgba(239,68,68,0.2); border:1px solid #ef4444; color:#fca5a5; padding:6px 14px; border-radius:6px; cursor:pointer; font-weight:bold; font-size:0.85rem;" onmouseover="this.style.background='#dc2626'; this.style.color='#fff';" onmouseout="this.style.background='rgba(239,68,68,0.2)'; this.style.color='#fca5a5';">🗑️ מחק פריט</button>
+                    </div>
                 </div>
             `;
             document.getElementById('detailModal').classList.add('active');
@@ -894,6 +1481,92 @@
 
         function closeModal() {
             document.getElementById('detailModal').classList.remove('active');
+        }
+
+        
+        function openEditModal(id, fromDetail = false) {
+            const r = currentRecords.find(item => String(item.id) === String(id));
+            if (!r) return;
+            document.getElementById('editRecordId').value = r.id;
+            document.getElementById('editTitle').value = r.title || '';
+            
+            let summaryVal = r.summary || '';
+            if (summaryVal.startsWith('קבצי אינפוגרפיקה הועלו:')) summaryVal = '';
+            document.getElementById('editSummary').value = summaryVal;
+
+            let transcriptVal = r.transcript || '';
+            if (transcriptVal.startsWith('קבצי אינפוגרפיקה הועלו:')) transcriptVal = '';
+            document.getElementById('editTranscript').value = transcriptVal;
+
+            if (fromDetail) {
+                closeModal();
+            }
+            document.getElementById('editModal').classList.add('active');
+        }
+
+        function closeEditModal() {
+            document.getElementById('editModal').classList.remove('active');
+        }
+
+        async function saveRecordEdit() {
+            const id = document.getElementById('editRecordId').value;
+            const title = document.getElementById('editTitle').value.trim();
+            const summary = document.getElementById('editSummary').value.trim();
+            const transcript = document.getElementById('editTranscript').value.trim();
+
+            if (!id || !title) {
+                alert('אנא הזן כותרת לפריט.');
+                return;
+            }
+
+            try {
+                const res = await fetch(`/api/v1/records/${id}`, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        title: title,
+                        summary: summary,
+                        transcript: transcript
+                    })
+                });
+                const data = await res.json();
+                if (res.ok) {
+                    closeEditModal();
+                    fetchRecords();
+                } else {
+                    alert('❌ שגיאה בשמירת השינויים: ' + (data.detail || 'שגיאה'));
+                }
+            } catch (err) {
+                console.error('Error updating record:', err);
+                alert('❌ שגיאה בתקשורת עם השרת בעת עדכון הפריט');
+            }
+        }
+
+        async function deleteRecord(id, isFromModal = false) {
+            const r = currentRecords.find(item => String(item.id) === String(id));
+            const title = r ? r.title : 'פריט זה';
+            if (!confirm(`האם אתה בטוח שברצונך למחוק לצמיתות את הפריט:\n"${title}"?`)) {
+                return;
+            }
+
+            try {
+                const res = await fetch(`/api/v1/records/${id}`, {
+                    method: 'DELETE'
+                });
+                const data = await res.json();
+                if (res.ok) {
+                    selectedRecordIds.delete(id);
+                    if (isFromModal) {
+                        closeModal();
+                    }
+                    fetchRecords();
+                } else {
+                    alert('❌ שגיאה במחיקת הפריט: ' + (data.detail || 'שגיאה'));
+                }
+            } catch (err) {
+                console.error('Error deleting record:', err);
+                alert('❌ שגיאה בתקשורת עם השרת בעת מחיקה');
+            }
         }
 
         document.getElementById('captureForm').addEventListener('submit', async (e) => {
@@ -976,6 +1649,372 @@
             fetchRecords();
         }
 
+        function csvTerms(id) {
+            const el = document.getElementById(id);
+            if (!el || !el.value.trim()) return [];
+            return el.value.split(',').map(item => item.trim()).filter(Boolean);
+        }
+
+        function cookNumber(id) {
+            const el = document.getElementById(id);
+            if (!el || !el.value) return null;
+            const parsed = Number(el.value);
+            return Number.isFinite(parsed) && parsed > 0 ? parsed : null;
+        }
+
+        function buildCookPilotRequest(command = null) {
+            const currentStep = cookPilotLastPlan ? cookPilotLastPlan.current_step : 1;
+            return {
+                goal: document.getElementById('cookGoal')?.value || 'cook_with_what_i_have',
+                available_ingredients: csvTerms('cookIngredients'),
+                avoid_ingredients: csvTerms('cookAvoid'),
+                dietary_preferences: csvTerms('cookDiet'),
+                equipment: csvTerms('cookEquipment'),
+                servings: cookNumber('cookServings'),
+                max_minutes: cookNumber('cookMinutes'),
+                voice_input: document.getElementById('cookVoiceInput')?.value || null,
+                current_step: currentStep,
+                command,
+                include_saved_sources: Boolean(document.getElementById('cookUseSources')?.checked)
+            };
+        }
+
+        function validateCookPilotRequest(request) {
+            const issues = [];
+            if (!request.goal || !request.goal.trim()) issues.push('Goal is required.');
+            if (!request.available_ingredients.length && !request.voice_input) issues.push('Add ingredients or a voice prompt.');
+            if (request.servings !== null && request.servings < 1) issues.push('Servings must be positive.');
+            if (request.max_minutes !== null && request.max_minutes < 1) issues.push('Minutes must be positive.');
+            return issues;
+        }
+
+        function setCookPilotBusy(isBusy, label = 'planning') {
+            const statusEl = document.getElementById('cookPilotStatus');
+            const startButton = document.querySelector('#cookPilotControls button[onclick="handleCookPilotPlan()"]');
+            if (statusEl) {
+                statusEl.textContent = isBusy ? label : (cookPilotLastPlan ? 'active' : 'idle');
+                statusEl.className = `cook-pill ${isBusy ? 'cook-status-caution' : ''}`;
+            }
+            if (startButton) startButton.disabled = isBusy;
+        }
+
+        function persistCookPilotDraft() {
+            const request = buildCookPilotRequest(null);
+            localStorage.setItem('cookPilotDraft', JSON.stringify(request));
+            document.getElementById('cookPilotStatus').textContent = 'draft saved';
+        }
+
+        function restoreCookPilotDraft() {
+            const raw = localStorage.getItem('cookPilotDraft');
+            if (!raw) {
+                alert('No Cook Pilot draft found.');
+                return;
+            }
+            const draft = JSON.parse(raw);
+            document.getElementById('cookGoal').value = draft.goal || 'cook_with_what_i_have';
+            document.getElementById('cookIngredients').value = (draft.available_ingredients || []).join(', ');
+            document.getElementById('cookAvoid').value = (draft.avoid_ingredients || []).join(', ');
+            document.getElementById('cookDiet').value = (draft.dietary_preferences || []).join(', ');
+            document.getElementById('cookEquipment').value = (draft.equipment || []).join(', ');
+            document.getElementById('cookServings').value = draft.servings || '';
+            document.getElementById('cookMinutes').value = draft.max_minutes || '';
+            document.getElementById('cookVoiceInput').value = draft.voice_input || '';
+            document.getElementById('cookUseSources').checked = draft.include_saved_sources !== false;
+            document.getElementById('cookPilotStatus').textContent = 'draft restored';
+        }
+
+        function clearCookPilotDraft() {
+            localStorage.removeItem('cookPilotDraft');
+            document.getElementById('cookPilotStatus').textContent = 'draft cleared';
+        }
+
+        async function copyCookPilotSummary() {
+            if (!cookPilotLastPlan) {
+                alert('Start Cook Pilot before copying a summary.');
+                return;
+            }
+            const summary = buildCookPilotPrintableSummary(cookPilotLastPlan);
+            await navigator.clipboard.writeText(summary);
+            document.getElementById('cookPilotStatus').textContent = 'copied';
+        }
+
+        function updateCookPilotProgressBar(plan) {
+            const bar = document.getElementById('cookProgressBar');
+            if (!bar) return;
+            const progress = Math.max(0, Math.min(100, plan.progress_percent || 0));
+            bar.style.width = `${progress}%`;
+            bar.style.background = progress >= 100 ? '#22c55e' : '#38bdf8';
+        }
+
+        function cookStatusClass(level) {
+            if (level === 'high' || level === 'blocked' || level === 'review_required') return 'cook-status-risk';
+            if (level === 'medium' || level === 'continue_with_caution' || level === 'tight') return 'cook-status-caution';
+            return 'cook-status-ready';
+        }
+
+        function cookUiStepSummary(plan) {
+            return {
+                action: plan.next_action || 'Ready.',
+                step: `${plan.current_step || 0}/${plan.total_steps || 0}`,
+                progress: `${plan.progress_percent || 0}% complete`,
+                complete: plan.is_complete ? 'complete' : 'active'
+            };
+        }
+
+        function cookUiRiskSummary(plan) {
+            const risk = plan.risk_review || {};
+            const gate = plan.quality_gate || {};
+            return {
+                level: risk.level || 'none',
+                status: gate.status || 'open',
+                issues: (risk.issues || []).slice(0, 3)
+            };
+        }
+
+        function cookUiTimerSummary(plan) {
+            const timer = plan.voice_timer_brief || {};
+            return {
+                next: timer.next_timer_minutes || plan.step_timer_minutes || 0,
+                pressure: timer.pressure || plan.timing_pressure_flags?.level || 'normal',
+                say: timer.say || plan.voice_checkpoint || 'No timer needed.'
+            };
+        }
+
+        function cookUiReadinessSummary(plan) {
+            return {
+                pantry: plan.pantry_readiness?.status || 'unknown',
+                confidence: plan.confidence?.band || 'unknown',
+                decision: plan.stop_or_continue?.decision || 'unknown'
+            };
+        }
+
+        function cookUiSourceSummary(plan) {
+            const sources = (plan.source_trace || []).map(src => `${src.title} (${src.match_reason})`);
+            const gaps = plan.source_gaps || [];
+            return [...sources.slice(0, 3), ...gaps.slice(0, 2)];
+        }
+
+        function cookUiSafetySummary(plan) {
+            return [
+                ...(plan.checkpoints || []).slice(0, 3),
+                ...(plan.sensory_stop_signals || []).slice(0, 2),
+                ...(plan.leftover_risk_flags || []).slice(0, 2)
+            ];
+        }
+
+        function cookUiVoiceSummary(plan) {
+            const handoff = plan.voice_handoff_brief || {};
+            return [
+                handoff.say_first || plan.voice_feedback,
+                handoff.recovery,
+                handoff.commands ? `Commands: ${handoff.commands}` : null
+            ].filter(Boolean);
+        }
+
+        function cookUiSessionSnapshot(plan) {
+            return {
+                title: plan.generated_note_title || plan.title || 'Cook Pilot Session',
+                method: plan.cooking_method || 'flexible',
+                step: `${plan.current_step || 0}/${plan.total_steps || 0}`,
+                risk: plan.risk_review?.level || 'none',
+                timer: plan.voice_timer_brief?.say || plan.voice_checkpoint || 'No timer needed.',
+                decision: plan.stop_or_continue?.decision || 'unknown',
+                saveReady: Boolean(plan.save_candidate)
+            };
+        }
+
+        function normalizeCookPilotVoiceCommand(raw) {
+            const text = String(raw || '').trim().toLowerCase();
+            if (!text) return null;
+            if (text.includes('next') || text.includes('continue') || text.includes('done')) return 'next';
+            if (text.includes('back') || text.includes('previous')) return 'back';
+            if (text.includes('repeat') || text.includes('again')) return 'repeat';
+            if (text.includes('stop') || text.includes('finish') || text.includes('complete')) return 'stop';
+            return null;
+        }
+
+        function applyCookPilotVoiceCommand() {
+            const command = normalizeCookPilotVoiceCommand(document.getElementById('cookVoiceInput')?.value);
+            if (command) {
+                sendCookPilotCommand(command);
+                return true;
+            }
+            return false;
+        }
+
+        function buildCookPilotPrintableSummary(plan) {
+            const snapshot = cookUiSessionSnapshot(plan);
+            const steps = (plan.suggested_plan || []).map((step, index) => `${index + 1}. ${step}`).join('\n');
+            const checks = cookUiSafetySummary(plan).map(item => `- ${item}`).join('\n');
+            return [
+                snapshot.title,
+                `Method: ${snapshot.method}`,
+                `Step: ${snapshot.step}`,
+                `Risk: ${snapshot.risk}`,
+                `Decision: ${snapshot.decision}`,
+                '',
+                'Checks:',
+                checks || '- No checks.',
+                '',
+                'Plan:',
+                steps || 'No plan.'
+            ].join('\n');
+        }
+
+        function fillCookPilotFromSelected() {
+            const selected = currentRecords.filter(record => selectedRecordIds.has(record.id));
+            const culinary = selected.filter(record => (record.primary_domain || '').toLowerCase() === 'culinary');
+            const source = culinary.length ? culinary : selected;
+            const text = source.map(record => [record.title, record.summary, record.transcript].filter(Boolean).join(' ')).join(' ').toLowerCase();
+            const known = ['apple','beans','bread','carrot','cheese','chicken','cinnamon','coconut milk','egg','garlic','ginger','lentils','lemon','mushroom','onion','pepper','potato','rice','salt','tomato','turmeric','zucchini'];
+            const found = known.filter(item => text.includes(item));
+            if (found.length) document.getElementById('cookIngredients').value = Array.from(new Set(found)).join(', ');
+            if (source[0]?.title) document.getElementById('cookGoal').value = source[0].title;
+        }
+
+        async function saveCookPilotSession() {
+            if (!cookPilotLastPlan?.save_candidate) {
+                alert('Start Cook Pilot before saving a session.');
+                return;
+            }
+            const res = await fetch('/api/v1/capture', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(cookPilotLastPlan.save_candidate)
+            });
+            if (res.ok) {
+                fetchRecords();
+                document.getElementById('cookPilotStatus').textContent = 'saved';
+            } else {
+                alert('Cook Pilot session could not be saved.');
+            }
+        }
+
+        function resetCookPilotSession() {
+            cookPilotLastPlan = null;
+            cookPilotLastRequest = null;
+            document.getElementById('cookPilotResult').style.display = 'none';
+            document.getElementById('cookPilotEmpty').style.display = 'block';
+            document.getElementById('cookPilotStatus').textContent = 'idle';
+            document.getElementById('cookPilotStatus').className = 'cook-pill';
+        }
+
+        function printCookPilotSummary() {
+            if (!cookPilotLastPlan) {
+                alert('Start Cook Pilot before printing a summary.');
+                return;
+            }
+            const summary = buildCookPilotPrintableSummary(cookPilotLastPlan);
+            const win = window.open('', '_blank');
+            if (!win) return;
+            win.document.write(`<pre style="font:14px system-ui; white-space:pre-wrap;">${summary.replace(/[&<>]/g, ch => ({'&':'&amp;','<':'&lt;','>':'&gt;'}[ch]))}</pre>`);
+            win.document.close();
+            win.print();
+        }
+
+        function renderCookList(id, items) {
+            const el = document.getElementById(id);
+            if (!el) return;
+            const clean = (items || []).filter(Boolean);
+            el.innerHTML = clean.length
+                ? clean.map(item => `<li>${String(item)}</li>`).join('')
+                : '<li>No items.</li>';
+        }
+
+        function renderCookPilot(plan) {
+            cookPilotLastPlan = plan;
+            document.getElementById('cookPilotEmpty').style.display = 'none';
+            document.getElementById('cookPilotResult').style.display = 'block';
+            updateCookPilotProgressBar(plan);
+
+            const snapshot = cookUiSessionSnapshot(plan);
+            const step = cookUiStepSummary(plan);
+            const risk = cookUiRiskSummary(plan);
+            const timer = cookUiTimerSummary(plan);
+            const ready = cookUiReadinessSummary(plan);
+            const statusEl = document.getElementById('cookPilotStatus');
+            statusEl.textContent = step.complete;
+            statusEl.className = `cook-pill ${cookStatusClass(risk.level)}`;
+
+            document.getElementById('cookNowAction').textContent = step.action;
+            document.getElementById('cookStepMeta').textContent = `Step ${step.step} - ${step.progress}`;
+            document.getElementById('cookTimerValue').textContent = timer.next ? `${timer.next} min` : 'no timer';
+            document.getElementById('cookTimerBrief').textContent = timer.say;
+            document.getElementById('cookRiskValue').textContent = risk.level;
+            document.getElementById('cookRiskBrief').textContent = risk.issues.join(' | ') || risk.status;
+            document.getElementById('cookReadinessValue').textContent = ready.pantry;
+            document.getElementById('cookReadinessBrief').textContent = `${ready.confidence} confidence - ${ready.decision}`;
+
+            const pills = [
+                snapshot.title,
+                plan.cooking_method,
+                plan.heat_level,
+                plan.cook_mode?.mode,
+                plan.nutrition_balance_check?.status,
+                plan.serving_risk_window?.priority
+            ].filter(Boolean);
+            document.getElementById('cookPills').innerHTML = pills.map(p => `<span class="cook-pill">${p}</span>`).join('');
+
+            renderCookList('cookChecks', cookUiSafetySummary(plan));
+            renderCookList('cookPlan', (plan.suggested_plan || []).slice(0, 7));
+            renderCookList('cookMemory', [
+                ...cookUiSourceSummary(plan),
+                ...(plan.next_cook_memory_patch?.remember || []).slice(0, 2)
+            ]);
+            renderCookList('cookHeat', [
+                plan.heat_zone_plan?.action,
+                ...(plan.doneness_escalation_path || []).slice(0, 4),
+                plan.heat_recovery_plan?.action
+            ]);
+            renderCookList('cookServing', [
+                plan.serving_risk_window?.action,
+                plan.batch_hold_strategy?.guidance,
+                ...(plan.tool_cleanup_order || []).slice(0, 3)
+            ]);
+            renderCookList('cookVoice', cookUiVoiceSummary(plan));
+        }
+
+        async function handleCookPilotPlan(command = null) {
+            if (!command && applyCookPilotVoiceCommand()) return;
+            const request = buildCookPilotRequest(command);
+            const issues = validateCookPilotRequest(request);
+            if (issues.length) {
+                alert(issues.join('\n'));
+                return;
+            }
+            cookPilotLastRequest = request;
+            setCookPilotBusy(true);
+
+            const res = await fetch('/api/v1/cook-pilot/plan', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(request)
+            });
+            const data = await res.json();
+            if (!res.ok) {
+                setCookPilotBusy(false);
+                const statusEl = document.getElementById('cookPilotStatus');
+                statusEl.textContent = 'error';
+                statusEl.className = 'cook-pill cook-status-risk';
+                alert(data.detail || 'Cook Pilot failed.');
+                return;
+            }
+            renderCookPilot(data);
+            setCookPilotBusy(false);
+        }
+
+        function sendCookPilotCommand(command) {
+            handleCookPilotPlan(command);
+        }
+
+        document.addEventListener('keydown', (event) => {
+            if (!cookPilotKeyboardEnabled || event.target.matches('input, textarea, select')) return;
+            if (event.key === 'ArrowRight') sendCookPilotCommand('next');
+            if (event.key === 'ArrowLeft') sendCookPilotCommand('back');
+            if (event.key.toLowerCase() === 'r') sendCookPilotCommand('repeat');
+            if (event.key === 'Escape') sendCookPilotCommand('stop');
+        });
+
         async function handleBuildOutput() {
             if (selectedRecordIds.size === 0) {
                 alert("אנא בחר לפחות רשומה אחת להרכבת תוצר.");
@@ -998,7 +2037,11 @@
             document.getElementById('outputVoiceScript').innerText = `🗣️ הקראה קולית: ${data.voice_script}`;
         }
 
-        document.addEventListener('DOMContentLoaded', loadDomainConfig);
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', loadDomainConfig);
+        } else {
+            loadDomainConfig();
+        }
     </script>
 </body>
 </html>

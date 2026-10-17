@@ -104,6 +104,18 @@ created_at: "{record.created_at}"
         filepath.write_text(yaml_frontmatter, encoding="utf-8")
         return filepath
 
+    def delete_record_markdown(self, record: ContentRecord) -> bool:
+        vault_dir = settings.VAULT_DIR
+        pattern = f"*_{record.id[:8]}.md"
+        deleted = False
+        for file in vault_dir.rglob(pattern):
+            try:
+                file.unlink(missing_ok=True)
+                deleted = True
+            except Exception:
+                pass
+        return deleted
+
     def sync_all(self) -> int:
         with Session(engine) as session:
             records = session.exec(select(ContentRecord)).all()

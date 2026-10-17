@@ -3,8 +3,12 @@ import uuid
 from pathlib import Path
 from typing import Optional, List
 from fastapi import APIRouter, HTTPException, UploadFile, File, Form
-from app.schemas.content import ContentCaptureRequest, ContentEnrichRequest, CookPilotRequest
+from fastapi.responses import FileResponse
+from app.schemas.content import ContentCaptureRequest, ContentEnrichRequest, CookPilotRequest, ContentUpdateRequest
 from app.schemas.voice import VoiceCaptureRequest
+from app.db.database import engine
+from app.db.models import ContentRecord, ContentRelation
+from sqlmodel import Session, select
 from app.domain.capture import capture_engine
 from app.domain.enrichment import enrichment_engine
 from app.domain.retrieval import retrieval_engine
@@ -84,7 +88,7 @@ async def upload_file_capture(
     
     count_str = f" ({len(saved_urls)} קבצים)" if len(saved_urls) > 1 else ""
     record_title = title or f"אינפוגרפיקה: {', '.join(file_names[:2])}{count_str}"
-    record_text = content_text or f"קבצי אינפוגרפיקה הועלו: {', '.join(file_names)}"
+    record_text = content_text or ""
     
     record = capture_engine.capture_text_or_url(
         title=record_title,
@@ -200,3 +204,113 @@ def plan_cook(req: CookPilotRequest):
         command=req.command,
         include_saved_sources=req.include_saved_sources,
     )
+
+@router.post("/records/{record_id}/cover-image")
+async def add_record_cover_image(record_id: str, file: UploadFile = File(...)):
+    uploads_dir = settings.DATA_DIR / "uploads"
+    uploads_dir.mkdir(parents=True, exist_ok=True)
+    
+    unique_filename = f"{uuid.uuid4().hex[:10]}_{file.filename}"
+    file_path = uploads_dir / unique_filename
+    
+    content_bytes = await file.read()
+    with open(file_path, "wb") as f:
+        f.write(content_bytes)
+        
+    img_url = f"/data/uploads/{unique_filename}"
+    
+    with Session(engine) as session:
+        record = session.get(ContentRecord, record_id)
+        if not record:
+            raise HTTPException(status_code=404, detail="רשומה לא נמצאה")
+            
+        if not record.source_url:
+            record.source_url = img_url
+        else:
+            try:
+                urls = json.loads(record.source_url)
+                if isinstance(urls, list):
+                    urls.append(img_url)
+                    record.source_url = json.dumps(urls, ensure_ascii=False)
+                else:
+                    record.source_url = json.dumps([record.source_url, img_url], ensure_ascii=False)
+            except Exception:
+                record.source_url = json.dumps([record.source_url, img_url], ensure_ascii=False)
+                
+        session.add(record)
+        session.commit()
+        session.refresh(record)
+        
+        obsidian_sync_engine.export_record_to_markdown(record)
+        return {"status": "COVER_IMAGE_ADDED", "record_id": record.id, "cover_url": img_url, "source_url": record.source_url}
+
+@router.get("/records/{record_id}/markdown")
+def get_record_markdown(record_id: str):
+    with Session(engine) as session:
+        record = session.get(ContentRecord, record_id)
+        if not record:
+            raise HTTPException(status_code=404, detail="רשומה לא נמצאה")
+        filepath = obsidian_sync_engine.export_record_to_markdown(record)
+        if filepath and filepath.exists():
+            return FileResponse(filepath, media_type="text/markdown", filename=filepath.name)
+        raise HTTPException(status_code=404, detail="קובץ Markdown לא נמצא")
+
+@router.delete("/records/{record_id}")
+def delete_record(record_id: str):
+    with Session(engine) as session:
+        record = session.get(ContentRecord, record_id)
+        if not record:
+            raise HTTPException(status_code=404, detail="רשומה לא נמצאה")
+        
+        # Delete related links
+        relations = session.exec(
+            select(ContentRelation).where(
+                (ContentRelation.source_id == record_id) | (ContentRelation.target_id == record_id)
+            )
+        ).all()
+        for rel in relations:
+            session.delete(rel)
+            
+        # Delete Obsidian markdown file
+        obsidian_sync_engine.delete_record_markdown(record)
+        
+        session.delete(record)
+        session.commit()
+        return {"status": "DELETED", "record_id": record_id}
+
+@router.put("/records/{record_id}")
+def update_record(record_id: str, req: ContentUpdateRequest):
+    with Session(engine) as session:
+        record = session.get(ContentRecord, record_id)
+        if not record:
+            raise HTTPException(status_code=404, detail="רשומה לא נמצאה")
+        
+        if req.title is not None:
+            record.title = req.title
+        if req.summary is not None:
+            record.summary = req.summary
+        if req.transcript is not None:
+            record.transcript = req.transcript
+        if req.primary_domain is not None:
+            record.primary_domain = req.primary_domain
+        if req.domains is not None:
+            record.domains_json = json.dumps(req.domains, ensure_ascii=False)
+        if req.sub_topics is not None:
+            record.sub_topics_json = json.dumps(req.sub_topics, ensure_ascii=False)
+        if req.custom_tags is not None:
+            record.custom_tags_json = json.dumps(req.custom_tags, ensure_ascii=False)
+        if req.source_url is not None:
+            record.source_url = req.source_url
+        if req.source_type is not None:
+            record.source_type = req.source_type
+
+        session.add(record)
+        session.commit()
+        session.refresh(record)
+
+        obsidian_sync_engine.export_record_to_markdown(record)
+        return {"status": "UPDATED", "record_id": record.id, "title": record.title}
+
+
+
+

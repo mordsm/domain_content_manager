@@ -19,6 +19,8 @@ class Settings:
     DATABASE_URL: str = os.getenv("DATABASE_URL", f"sqlite:///{BASE_DIR / 'data' / 'domain_content.db'}")
     DEFAULT_WORKSPACE: str = os.getenv("DEFAULT_WORKSPACE", "default_ws")
     DEFAULT_OWNER: str = os.getenv("DEFAULT_OWNER", "default_owner")
+    HOST: str = os.getenv("HOST", "0.0.0.0")
+    PORT: int = int(os.getenv("PORT", "8070"))
 
     def __init__(self):
         self.DATA_DIR.mkdir(parents=True, exist_ok=True)

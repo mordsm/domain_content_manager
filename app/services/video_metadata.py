@@ -126,3 +126,4 @@ def fetch_video_metadata(url: str) -> Dict[str, Any]:
         "keywords": keywords,
         "is_video": True
     }
+

@@ -8,7 +8,7 @@ domains: ["AI", "general"]
 sub_topics: ["tips", "models"]
 custom_tags: ["וידאו", "מומלץ"]
 source_type: "video"
-source_url: "https://youtube.com/watch?v=ai_chatgpt_guide_1"
+source_url: "https://www.youtube.com/watch?v=tRvcAdqsJWo"
 status: "inbox"
 reliability_layer: "research"
 risk_level: "none"

@@ -8,7 +8,7 @@ domains: ["financial", "general"]
 sub_topics: ["investments", "budgeting", "pension_fire", "pension_fire"]
 custom_tags: ["שואב_אוטומטי", "רשומה_נבחרת"]
 source_type: "article"
-source_url: "https://finance-blog.co.il/budget-index-funds"
+source_url: "https://www.hasolidit.com"
 status: "tagged"
 reliability_layer: "personal"
 risk_level: "medium"

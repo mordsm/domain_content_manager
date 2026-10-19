@@ -59,10 +59,13 @@ domains:
         keywords: ["כוח", "שריר", "חיזוק", "משקולות"]
       hair:
         label_he: "שיער"
-        keywords: ["שיער", "נשירה", "זקיקים", "חפיפה", "שמפו", "מסכה"]
-      scalp_health:
-        label_he: "בריאות הקרקפת"
-        keywords: ["קרקפת", "רוזמרין", "חוחובה", "קשקשים", "שמנים"]
+        keywords: ["שיער", "נשירה", "זקיקים", "חפיפה", "שמפו", "קרקפת","רוזמרין"]
+      nerve_system:
+        label_he: "מערכת העצבים"
+        keywords: []
+      brain:
+        label_he: "מוח"
+        keywords: []
 
   diet:
     label_he: "דיאטה"

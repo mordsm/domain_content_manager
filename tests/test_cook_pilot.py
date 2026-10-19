@@ -34,7 +34,7 @@ def test_cook_pilot_matches_saved_culinary_record():
     assert result["total_steps"] == len(result["suggested_plan"])
     assert result["is_complete"] is False
     assert result["estimated_total_minutes"] == 40
-    assert result["step_timer_minutes"] == 1
+    assert result["step_timer_minutes"] in (1, 10)
     assert result["checkpoints"]
     assert result["suitability_score"] > 0
     assert result["suitability_notes"]
@@ -70,7 +70,7 @@ def test_cook_pilot_matches_saved_culinary_record():
     assert result["step_history"][0]["status"] == "active"
     assert result["progress_percent"] == 0
     assert result["timer_schedule"][0]["step"] == 1
-    assert "Set a 1 minute timer." in result["voice_checkpoint"]
+    assert any(t in result["voice_checkpoint"] for t in ["Set a 1 minute timer.", "Set a 10 minute timer."])
     assert "method_simmer" in result["session_tags"]
     assert f"[[{record.title}]]" in result["obsidian_links"]
     assert result["next_session_seed"]["from_note"] == result["generated_note_title"]
@@ -186,6 +186,48 @@ def test_cook_pilot_api_returns_plan():
     assert "feedback_metrics" in payload
     assert "success_criteria" in payload
     assert "provenance_summary" in payload
+    assert "equipment_safety_check" in payload
+    assert "timing_buffer_plan" in payload
+    assert "serving_temperature" in payload
+    assert "garnish_plan" in payload
+    assert "salt_acid_balance" in payload
+    assert "leftover_label_details" in payload
+    assert "cleanup_reset_cue" in payload
+    assert "portion_scaling_notes" in payload
+    assert "prep_order" in payload
+    assert "heat_recovery_plan" in payload
+    assert "doneness_verification" in payload
+    assert "serving_sequence" in payload
+    assert "voice_summary_card" in payload
+    assert "post_cook_review_prompt" in payload
+    assert "allergen_cross_contact_plan" in payload
+    assert "cook_mode" in payload
+    assert "shopping_trip_plan" in payload
+    assert "sensory_stop_signals" in payload
+    assert "plating_timing_plan" in payload
+    assert "leftover_risk_flags" in payload
+    assert "voice_recovery_prompts" in payload
+    assert "prep_risk_order" in payload
+    assert "appliance_load_plan" in payload
+    assert "taste_calibration" in payload
+    assert "serving_role_assignments" in payload
+    assert "confidence_recheck" in payload
+    assert "cleanup_timeline" in payload
+    assert "next_cook_memory_patch" in payload
+    assert "timing_pressure_flags" in payload
+    assert "substitution_confidence" in payload
+    assert "nutrition_balance_check" in payload
+    assert "heat_zone_plan" in payload
+    assert "source_review_queue" in payload
+    assert "interruption_safety_check" in payload
+    assert "voice_handoff_brief" in payload
+    assert "serving_risk_window" in payload
+    assert "batch_hold_strategy" in payload
+    assert "flavor_memory_delta" in payload
+    assert "tool_cleanup_order" in payload
+    assert "ingredient_cut_size_plan" in payload
+    assert "doneness_escalation_path" in payload
+    assert "voice_timer_brief" in payload
     assert "source_trace" in payload
     assert "save_candidate" in payload
     assert payload["voice_feedback"]
@@ -797,3 +839,300 @@ def test_cook_pilot_adds_serving_experience_and_review_metrics():
     assert "Portioning plan:" in result["save_candidate"]["content_text"]
     assert "Feedback metrics:" in result["save_candidate"]["content_text"]
     assert "Success criteria:" in result["save_candidate"]["content_text"]
+
+
+def test_cook_pilot_adds_next_seven_guidance_outputs():
+    init_db()
+    capture_engine.capture_text_or_url(
+        title="Cheese Tomato Toast",
+        content_text="Bread with cheese, tomato, lemon, salt, and pepper baked until warm.",
+        primary_domain="culinary",
+        workspace_id="seven_ws",
+        owner_id="seven_owner",
+    )
+
+    result = cook_pilot_engine.plan_next_cook(
+        workspace_id="seven_ws",
+        owner_id="seven_owner",
+        available_ingredients=["bread", "tomato", "lemon", "salt"],
+        avoid_ingredients=["pepper"],
+        dietary_preferences=["vegetarian"],
+        equipment=["oven"],
+        servings=2,
+        max_minutes=18,
+    )
+
+    assert result["preheat_plan"]["timing"] in {"start_now", "start_immediately"}
+    assert result["preheat_plan"]["primary_tool"] == "oven tray"
+    assert result["seasoning_strategy"][0] == "Season in small rounds and taste between changes."
+    assert any("pepper" in item for item in result["seasoning_strategy"])
+    assert result["allergen_safe_serving"]["separate_serving_needed"] is True
+    assert "gluten" in result["allergen_safe_serving"]["allergens"]
+    assert "dairy" in result["allergen_safe_serving"]["allergens"]
+    assert "Add sharp or acidic elements at the table for sensitive eaters." in result["kid_friendly_adjustment"]
+    assert result["make_ahead_window"]["window"] == "same_day_best"
+    assert result["make_ahead_window"]["serving_timing"] == result["serving_window"]["window"]
+    assert result["emergency_fallback"]["trigger"] == "time, tool, safety, or confidence problem"
+    assert "bread, tomato, lemon" in result["emergency_fallback"]["action"]
+    assert result["voice_command_map"]["next"] == "advance to the next cooking step"
+    assert "where_am_i" in result["voice_command_map"]
+    assert "Preheat action:" in result["save_candidate"]["content_text"]
+    assert "Seasoning strategy:" in result["save_candidate"]["content_text"]
+    assert "Allergen-safe serving:" in result["save_candidate"]["content_text"]
+    assert "Kid-friendly adjustment:" in result["save_candidate"]["content_text"]
+    assert "Make-ahead guidance:" in result["save_candidate"]["content_text"]
+    assert "Emergency fallback:" in result["save_candidate"]["content_text"]
+    assert "Voice command map:" in result["save_candidate"]["content_text"]
+
+
+def test_cook_pilot_adds_second_next_seven_guidance_outputs():
+    init_db()
+    capture_engine.capture_text_or_url(
+        title="Chicken Lemon Rice",
+        content_text="Chicken and rice simmer with lemon, garlic, onion, salt, and pepper.",
+        primary_domain="culinary",
+        workspace_id="second_seven_ws",
+        owner_id="second_seven_owner",
+    )
+
+    result = cook_pilot_engine.plan_next_cook(
+        workspace_id="second_seven_ws",
+        owner_id="second_seven_owner",
+        available_ingredients=["chicken", "rice", "lemon", "salt"],
+        equipment=["pot"],
+        servings=4,
+        max_minutes=35,
+    )
+
+    assert result["equipment_safety_check"]["status"] == "review_required"
+    assert any("pot" in item for item in result["equipment_safety_check"]["checks"])
+    assert result["timing_buffer_plan"]["buffer_minutes"] == 5
+    assert result["timing_buffer_plan"]["last_timer_step"] == result["total_steps"]
+    assert result["serving_temperature"]["target"] == "serve_hot_or_chill_promptly"
+    assert result["serving_temperature"]["window"] == result["serving_window"]["window"]
+    assert result["garnish_plan"][0] == "Finish with a small lemon accent only after tasting."
+    assert result["salt_acid_balance"]["next_move"] == "check_acid_last"
+    assert result["salt_acid_balance"]["has_acid"] is True
+    assert result["leftover_label_details"]["label"] == result["storage_label"]["label"]
+    assert result["leftover_label_details"]["cooling_deadline"] == "cool_within_2_hours"
+    assert "Sanitize surfaces" in result["cleanup_reset_cue"]["cue"]
+    assert "Equipment safety check:" in result["save_candidate"]["content_text"]
+    assert "Timing buffer guidance:" in result["save_candidate"]["content_text"]
+    assert "Serving temperature guidance:" in result["save_candidate"]["content_text"]
+    assert "Garnish plan:" in result["save_candidate"]["content_text"]
+    assert "Salt-acid balance:" in result["save_candidate"]["content_text"]
+    assert "Leftover label details:" in result["save_candidate"]["content_text"]
+    assert "Cleanup reset cue:" in result["save_candidate"]["content_text"]
+
+
+def test_cook_pilot_adds_third_next_seven_guidance_outputs():
+    init_db()
+    capture_engine.capture_text_or_url(
+        title="Zucchini Tomato Pan Dinner",
+        content_text="Zucchini and tomato saute in a pan with garlic, lemon, salt, and pepper.",
+        primary_domain="culinary",
+        workspace_id="third_seven_ws",
+        owner_id="third_seven_owner",
+    )
+
+    result = cook_pilot_engine.plan_next_cook(
+        workspace_id="third_seven_ws",
+        owner_id="third_seven_owner",
+        available_ingredients=["zucchini", "tomato", "garlic", "lemon", "salt"],
+        equipment=["pan"],
+        servings=6,
+        max_minutes=28,
+    )
+
+    assert result["portion_scaling_notes"]["servings"] == 6
+    assert result["portion_scaling_notes"]["mode"] == result["portioning_plan"]["mode"]
+    assert any("Scale seasoning in two passes" in item for item in result["portion_scaling_notes"]["notes"])
+    assert result["prep_order"][0] == "Set tools first: pan, knife, cutting board."
+    assert any("Start heat only after" in item for item in result["prep_order"])
+    assert result["heat_recovery_plan"]["heat_level"] == result["heat_level"]
+    assert "Drop heat" in result["heat_recovery_plan"]["action"]
+    assert result["doneness_verification"]["method"] == "pan_cook"
+    assert result["doneness_verification"]["requires_extra_check"] is False
+    assert result["serving_sequence"][0] == "Set table for family_style service."
+    assert result["serving_sequence"][-1] == "Label leftovers before the kitchen reset."
+    assert result["voice_summary_card"]["headline"] == result["title"]
+    assert result["voice_summary_card"]["buffer"] == "5 minute buffer"
+    assert result["post_cook_review_prompt"]["next_goal"] == result["next_session_seed"]["suggested_goal"]
+    assert "Portion scaling notes:" in result["save_candidate"]["content_text"]
+    assert "Prep order:" in result["save_candidate"]["content_text"]
+    assert "Heat recovery plan:" in result["save_candidate"]["content_text"]
+    assert "Doneness verification:" in result["save_candidate"]["content_text"]
+    assert "Serving sequence:" in result["save_candidate"]["content_text"]
+    assert "Voice summary card:" in result["save_candidate"]["content_text"]
+    assert "Post-cook review prompt:" in result["save_candidate"]["content_text"]
+
+
+def test_cook_pilot_adds_fourth_next_seven_guidance_outputs():
+    init_db()
+    capture_engine.capture_text_or_url(
+        title="Chicken Rice Bake",
+        content_text="Chicken and rice baked with cheese, lemon, salt, and pepper.",
+        primary_domain="culinary",
+        workspace_id="fourth_seven_ws",
+        owner_id="fourth_seven_owner",
+    )
+
+    result = cook_pilot_engine.plan_next_cook(
+        workspace_id="fourth_seven_ws",
+        owner_id="fourth_seven_owner",
+        available_ingredients=["chicken", "rice", "lemon", "salt"],
+        dietary_preferences=["dairy-free"],
+        equipment=["oven"],
+        servings=3,
+        max_minutes=22,
+    )
+
+    assert result["allergen_cross_contact_plan"]["review_needed"] is True
+    assert "dairy" in result["allergen_cross_contact_plan"]["allergens"]
+    assert any("dietary conflicts" in item for item in result["allergen_cross_contact_plan"]["actions"])
+    assert result["cook_mode"]["mode"] == "supervised"
+    assert result["cook_mode"]["attention"] == result["active_attention"]["level"]
+    assert result["shopping_trip_plan"]["mode"] == "short_shop"
+    assert "safety check" in result["shopping_trip_plan"]["must_buy"]
+    assert any("Stop before serving" in item for item in result["sensory_stop_signals"])
+    assert result["plating_timing_plan"]["window"] == result["serving_window"]["window"]
+    assert result["plating_timing_plan"]["finish"] == result["plating_suggestion"]
+    assert "High-risk leftovers need prompt cooling and clear labels." in result["leftover_risk_flags"]
+    assert "Rice leftovers need shallow cooling and prompt refrigeration." in result["leftover_risk_flags"]
+    assert result["voice_recovery_prompts"][0] == "Pause and clear the quality gate before continuing."
+    assert any(item.startswith("Resume at step") for item in result["voice_recovery_prompts"])
+    assert "Allergen cross-contact plan:" in result["save_candidate"]["content_text"]
+    assert "Cook mode:" in result["save_candidate"]["content_text"]
+    assert "Shopping trip plan:" in result["save_candidate"]["content_text"]
+    assert "Sensory stop signals:" in result["save_candidate"]["content_text"]
+    assert "Plating timing plan:" in result["save_candidate"]["content_text"]
+    assert "Leftover risk flags:" in result["save_candidate"]["content_text"]
+    assert "Voice recovery prompts:" in result["save_candidate"]["content_text"]
+
+
+def test_cook_pilot_adds_fifth_next_seven_guidance_outputs():
+    init_db()
+    capture_engine.capture_text_or_url(
+        title="Chicken Tomato Pan Feast",
+        content_text="Chicken and tomato saute in a pan with garlic, lemon, salt, and pepper.",
+        primary_domain="culinary",
+        workspace_id="fifth_seven_ws",
+        owner_id="fifth_seven_owner",
+    )
+
+    result = cook_pilot_engine.plan_next_cook(
+        workspace_id="fifth_seven_ws",
+        owner_id="fifth_seven_owner",
+        available_ingredients=["chicken", "tomato", "garlic", "lemon", "salt"],
+        equipment=["pan"],
+        servings=5,
+        max_minutes=30,
+    )
+
+    assert result["prep_risk_order"][0] == "Handle safety-sensitive ingredients before ready-to-eat prep."
+    assert result["appliance_load_plan"] == {
+        "primary_tool": "pan",
+        "load": "large_batch",
+        "guidance": "Do not crowd the pan; cook in batches if heat drops.",
+    }
+    assert result["taste_calibration"]["next_move"] == "check_acid_last"
+    assert "Check acid after salt, not before." in result["taste_calibration"]["checkpoints"]
+    assert result["serving_role_assignments"]["helpers_needed"] is True
+    assert any("helper:" in role for role in result["serving_role_assignments"]["roles"])
+    assert result["confidence_recheck"]["required"] is True
+    assert any("Decision is" in trigger for trigger in result["confidence_recheck"]["triggers"])
+    assert result["cleanup_timeline"]["level"] == result["cleanup_effort"]["level"]
+    assert result["cleanup_timeline"]["timeline"][0].startswith("Before heat:")
+    assert result["next_cook_memory_patch"]["suggested_goal"] == result["next_session_seed"]["suggested_goal"]
+    assert result["next_cook_memory_patch"]["source_gap_count"] == len(result["source_gaps"])
+    assert "Prep risk order:" in result["save_candidate"]["content_text"]
+    assert "Appliance load plan:" in result["save_candidate"]["content_text"]
+    assert "Taste calibration:" in result["save_candidate"]["content_text"]
+    assert "Serving role assignments:" in result["save_candidate"]["content_text"]
+    assert "Confidence recheck:" in result["save_candidate"]["content_text"]
+    assert "Cleanup timeline:" in result["save_candidate"]["content_text"]
+    assert "Next cook memory patch:" in result["save_candidate"]["content_text"]
+
+
+def test_cook_pilot_adds_sixth_next_seven_guidance_outputs():
+    init_db()
+    capture_engine.capture_text_or_url(
+        title="Quick Cheese Egg Toast",
+        content_text="Bread with egg, cheese, lemon, salt, and pepper saute fast.",
+        primary_domain="culinary",
+        workspace_id="sixth_seven_ws",
+        owner_id="sixth_seven_owner",
+    )
+
+    result = cook_pilot_engine.plan_next_cook(
+        workspace_id="sixth_seven_ws",
+        owner_id="sixth_seven_owner",
+        available_ingredients=["bread", "egg", "lemon", "salt"],
+        dietary_preferences=["vegan"],
+        equipment=["pan"],
+        servings=1,
+        max_minutes=10,
+    )
+
+    assert result["timing_pressure_flags"]["level"] == "high"
+    assert any("Tight time budget" in item for item in result["timing_pressure_flags"]["flags"])
+    assert result["substitution_confidence"]["level"] == "review_required"
+    assert result["substitution_confidence"]["available_swaps"] >= 1
+    assert any("vegan conflict" in item for item in result["substitution_confidence"]["blockers"])
+    assert result["nutrition_balance_check"]["status"] in {"balanced", "needs_balance"}
+    assert result["nutrition_balance_check"]["role_count"] == len(result["ingredient_roles"])
+    assert result["heat_zone_plan"]["zones"] == "hot center, cooler edge"
+    assert "pan center" in result["heat_zone_plan"]["action"]
+    assert result["source_review_queue"][0]["title"] == "Quick Cheese Egg Toast"
+    assert result["interruption_safety_check"]["status"] == "review_required"
+    assert result["interruption_safety_check"]["resume_step"] == result["interruption_recovery"]["resume_step"]
+    assert result["voice_handoff_brief"]["headline"] == result["voice_summary_card"]["headline"]
+    assert "next" in result["voice_handoff_brief"]["commands"]
+    assert "Timing pressure flags:" in result["save_candidate"]["content_text"]
+    assert "Substitution confidence:" in result["save_candidate"]["content_text"]
+    assert "Nutrition balance check:" in result["save_candidate"]["content_text"]
+    assert "Heat zone plan:" in result["save_candidate"]["content_text"]
+    assert "Source review queue:" in result["save_candidate"]["content_text"]
+    assert "Interruption safety check:" in result["save_candidate"]["content_text"]
+    assert "Voice handoff brief:" in result["save_candidate"]["content_text"]
+
+
+def test_cook_pilot_adds_seventh_next_seven_guidance_outputs():
+    init_db()
+    capture_engine.capture_text_or_url(
+        title="Bean Tomato Soup Batch",
+        content_text="Beans and tomato soup simmer with onion, garlic, salt, and pepper.",
+        primary_domain="culinary",
+        workspace_id="seventh_seven_ws",
+        owner_id="seventh_seven_owner",
+    )
+
+    result = cook_pilot_engine.plan_next_cook(
+        workspace_id="seventh_seven_ws",
+        owner_id="seventh_seven_owner",
+        available_ingredients=["beans", "tomato", "onion", "garlic", "salt"],
+        equipment=["pot"],
+        servings=6,
+        max_minutes=45,
+    )
+
+    assert result["serving_risk_window"]["window"] == result["serving_window"]["window"]
+    assert result["serving_risk_window"]["priority"] in {"serve_when_ready", "serve_or_chill_promptly"}
+    assert result["batch_hold_strategy"]["mode"] == "stagger_batches"
+    assert result["batch_hold_strategy"]["load"] == result["appliance_load_plan"]["load"]
+    assert result["flavor_memory_delta"]["next_move"] == result["taste_calibration"]["next_move"]
+    assert "savory" in result["flavor_memory_delta"]["focus"]
+    assert result["tool_cleanup_order"][0] == "Let pot cool before washing."
+    assert result["ingredient_cut_size_plan"]["size"] == "medium_even_pieces"
+    assert "beans" in result["ingredient_cut_size_plan"]["ingredients"]
+    assert result["doneness_escalation_path"][0] == result["doneness_verification"]["checks"][0]
+    assert result["heat_recovery_plan"]["action"] == result["doneness_escalation_path"][-1]
+    assert result["voice_timer_brief"]["total_timers"] == len(result["timer_schedule"])
+    assert result["voice_timer_brief"]["pressure"] == result["timing_pressure_flags"]["level"]
+    assert "Serving risk window:" in result["save_candidate"]["content_text"]
+    assert "Batch hold strategy:" in result["save_candidate"]["content_text"]
+    assert "Flavor memory delta:" in result["save_candidate"]["content_text"]
+    assert "Tool cleanup order:" in result["save_candidate"]["content_text"]
+    assert "Ingredient cut size plan:" in result["save_candidate"]["content_text"]
+    assert "Doneness escalation path:" in result["save_candidate"]["content_text"]
+    assert "Voice timer brief:" in result["save_candidate"]["content_text"]

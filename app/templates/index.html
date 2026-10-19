@@ -481,12 +481,13 @@
             <h3 class="panel-title"><span>📥 קליטה מהירה (Capture)</span></h3>
             <form id="captureForm">
                 <div class="form-group">
-                    <label>כותרת / נושא</label>
-                    <input type="text" id="capTitle" class="form-control" placeholder="למשל: סרטון טיפים ליצירת תמונות ב-Midjourney">
+                    <label>כותרת / נושא (אם תשאיר ריק עם סרטון, יישאב אוטומטית מכותרת הסרטון)</label>
+                    <input type="text" id="capTitle" class="form-control" placeholder="למשל: מרק ירקות עשיר (או ריק לחילוץ אוטומטי מהסרטון)">
                 </div>
                 <div class="form-group">
-                    <label>🔗 קישור / URL (אופציונלי - YouTube / Vimeo / MP4)</label>
+                    <label>🔗 קישור לסרטון (YouTube / Vimeo / MP4)</label>
                     <input type="url" id="capSourceUrl" class="form-control" placeholder="https://youtube.com/watch?v=..." oninput="autoDetectSourceType()">
+                    <div id="videoDetectBadge" style="display:none; background:rgba(56, 189, 248, 0.12); border:1px solid #38bdf8; color:#7dd3fc; border-radius:6px; padding:6px 10px; font-size:0.83rem; margin-top:6px;"></div>
                 </div>
                 <div class="form-group">
                     <label>סוג מקור</label>
@@ -500,10 +501,10 @@
                 </div>
                 <div class="form-group" style="background: rgba(2, 132, 199, 0.12); border: 2px dashed #38bdf8; padding: 15px; border-radius: 12px; text-align: center; margin-bottom: 1.25rem;">
                     <label style="font-size: 1.05rem; color: #38bdf8; font-weight: 700; display: block; margin-bottom: 8px;">
-                        📂 העלאת אינפוגרפיקות מהמחשב (ניתן לבחור מספר קבצי JPEG / PNG פעם אחת)
+                        📂 העלאת אינפוגרפיקה / תמונה (ניתן לשלב יחד עם סרטון באותו תא!)
                     </label>
                     <input type="file" id="capFile" class="form-control" accept="image/jpeg,image/jpg,image/png,image/webp,image/gif" multiple onchange="autoSelectInfographic()" style="background: #0f172a; border: 1px solid #0284c7; color: #fff; padding: 10px; font-size: 0.95rem; cursor: pointer;">
-                    <span style="color: #cbd5e1; font-size: 0.82rem; display: block; margin-top: 6px;">💡 ניתן לבחור מספר קבצי תמונה יחד (במקביל) לפריט אינפוגרפיקה אחד!</span>
+                    <span style="color: #cbd5e1; font-size: 0.82rem; display: block; margin-top: 6px;">💡 ניתן לבחור אינפוגרפיקה וקישור לסרטון יחד – שניהם יוצגו זה לצד זה באותו תא!</span>
                     <span id="fileCountNotice" style="display:none; color:#10b981; font-weight:700; font-size:0.9rem; margin-top:8px;"></span>
                 </div>
                 <div class="form-group">
@@ -931,6 +932,42 @@
             }
         }
 
+        function switchCellMedia(recordId, type) {
+            const vidBox = document.getElementById(`media-view-vid-${recordId}`);
+            const imgBox = document.getElementById(`media-view-img-${recordId}`);
+            const tabVid = document.getElementById(`media-tab-vid-${recordId}`);
+            const tabImg = document.getElementById(`media-tab-img-${recordId}`);
+            if (!vidBox || !imgBox) return;
+
+            if (type === 'video') {
+                vidBox.style.display = 'block';
+                imgBox.style.display = 'none';
+                if (tabVid) {
+                    tabVid.style.background = 'rgba(2,132,199,0.35)';
+                    tabVid.style.borderColor = '#0284c7';
+                    tabVid.style.color = '#38bdf8';
+                }
+                if (tabImg) {
+                    tabImg.style.background = '#1e293b';
+                    tabImg.style.borderColor = '#334155';
+                    tabImg.style.color = '#94a3b8';
+                }
+            } else {
+                vidBox.style.display = 'none';
+                imgBox.style.display = 'block';
+                if (tabImg) {
+                    tabImg.style.background = 'rgba(16,185,129,0.35)';
+                    tabImg.style.borderColor = '#10b981';
+                    tabImg.style.color = '#34d399';
+                }
+                if (tabVid) {
+                    tabVid.style.background = '#1e293b';
+                    tabVid.style.borderColor = '#334155';
+                    tabVid.style.color = '#94a3b8';
+                }
+            }
+        }
+
         function renderCardSourceLink(r) {
             const urls = getParsedSourceUrls(r.source_url);
             if (!urls.length) return '';
@@ -1186,12 +1223,53 @@
                         return `<span style="background:rgba(236, 72, 153, 0.15); border:1px solid rgba(236, 72, 153, 0.4); padding:2px 8px; border-radius:12px; font-size:0.75rem; margin-left:4px; color:#f472b6;">🔖 #${ct}</span>`;
                     }).join('');
 
-                    const isVideo = isVideoRecord(r);
+                    const allSourceUrls = getParsedSourceUrls(r.source_url);
+                    const videoUrl = allSourceUrls.find(u => typeof u === 'string' && /(?:youtube\.com|youtu\.be|vimeo\.com|\.mp4)/i.test(u)) || (isVideoRecord(r) ? allSourceUrls[0] : null);
+                    const imageUrls = allSourceUrls.filter(u => typeof u === 'string' && (u.startsWith('/data/uploads/') || /\.(jpg|jpeg|png|webp|gif)$/i.test(u)));
+                    if (r.original_media_url && !imageUrls.includes(r.original_media_url) && !/(?:youtube\.com|youtu\.be)/i.test(r.original_media_url)) {
+                        imageUrls.unshift(r.original_media_url);
+                    }
+
+                    const isVideo = isVideoRecord(r) || !!videoUrl;
+                    const hasImages = imageUrls.length > 0;
+                    const isDualMedia = isVideo && hasImages;
                     const webUrl = getWebPageUrl(r);
                     const isWebPage = !isVideo && !!webUrl;
                     const coverUrl = getCoverImageUrl(r);
                     let coverHeaderHTML = '';
-                    if (coverUrl) {
+
+                    if (isDualMedia) {
+                        const ytId = getYouTubeVideoId(videoUrl);
+                        const videoCoverUrl = ytId ? `https://img.youtube.com/vi/${ytId}/hqdefault.jpg` : (imageUrls[0] || '');
+                        
+                        coverHeaderHTML = `
+                            <div class="dual-media-box" onclick="event.stopPropagation()" style="background:#0b1329; border:1px solid #334155; border-radius:8px; overflow:hidden; margin-bottom:12px;">
+                                <div style="display:flex; gap:2px; background:#0f172a; border-bottom:1px solid #1e293b; padding:4px 6px;">
+                                    <button id="media-tab-vid-${r.id}" class="media-tab-btn" onclick="switchCellMedia('${r.id}', 'video')" style="flex:1; background:rgba(2,132,199,0.35); border:1px solid #0284c7; color:#38bdf8; border-radius:6px; padding:5px 4px; font-size:0.75rem; font-weight:bold; cursor:pointer;">
+                                        🎥 סרטון וידאו
+                                    </button>
+                                    <button id="media-tab-img-${r.id}" class="media-tab-btn" onclick="switchCellMedia('${r.id}', 'image')" style="flex:1; background:#1e293b; border:1px solid #334155; color:#94a3b8; border-radius:6px; padding:5px 4px; font-size:0.75rem; font-weight:bold; cursor:pointer;">
+                                        📊 אינפוגרפיקה (${imageUrls.length})
+                                    </button>
+                                </div>
+                                <div id="media-view-vid-${r.id}" class="cover-image-box" onclick="playVideoFromCard('${r.id}', this)" style="position:relative; cursor:pointer; margin-bottom:0; border:none; border-radius:0;" title="▶ לחץ להפעלת הסרטון מיד כאן בתא">
+                                    <img src="${videoCoverUrl}" alt="${r.title}">
+                                    <div class="video-play-btn" style="position:absolute; top:50%; left:50%; transform:translate(-50%, -50%); background:rgba(220, 38, 38, 0.9); border:2px solid #ffffff; border-radius:50%; width:48px; height:48px; display:flex; align-items:center; justify-content:center; color:#fff; font-size:1.3rem; box-shadow:0 4px 16px rgba(0,0,0,0.7); pointer-events:none; transition:transform 0.2s;">
+                                        ▶
+                                    </div>
+                                    <div style="position:absolute; bottom:8px; right:8px; background:rgba(15,23,42,0.9); color:#38bdf8; font-size:0.72rem; font-weight:bold; padding:2px 8px; border-radius:4px; border:1px solid rgba(56,189,248,0.4);">
+                                        🎥 לחץ לנגינה
+                                    </div>
+                                </div>
+                                <div id="media-view-img-${r.id}" class="cover-image-box" style="display:none; position:relative; cursor:pointer; margin-bottom:0; border:none; border-radius:0;" onclick="openDetailModal('${r.id}')" title="🔍 לחץ לצפייה מלאה באינפוגרפיקה">
+                                    <img src="${imageUrls[0]}" alt="${r.title}">
+                                    <div style="position:absolute; bottom:8px; right:8px; background:rgba(15,23,42,0.9); color:#10b981; font-size:0.72rem; font-weight:bold; padding:2px 8px; border-radius:4px; border:1px solid rgba(16,185,129,0.4);">
+                                        📊 אינפוגרפיקה (1 מתוך ${imageUrls.length})
+                                    </div>
+                                </div>
+                            </div>
+                        `;
+                    } else if (coverUrl) {
                         let clickHandler = '';
                         let tooltip = r.title;
                         let badgeOverlay = '';
@@ -1241,6 +1319,8 @@
                         `;
                     }
 
+                    const dualMediaBadge = isDualMedia ? `<span style="background:linear-gradient(135deg, rgba(2,132,199,0.35), rgba(16,185,129,0.35)); border:1px solid #0284c7; color:#38bdf8; font-size:0.75rem; font-weight:bold; padding:2px 8px; border-radius:12px; margin-left:4px;">🎥 סרטון + 📊 אינפוגרפיקה</span>` : '';
+
                     return `
                         <div class="record-card" onclick="openDetailModal('${r.id}')">
                             ${coverHeaderHTML}
@@ -1253,7 +1333,7 @@
                                     <h4 class="card-title">${r.title}</h4>
                                 </div>
                                 <div style="display:flex; align-items:center; gap:6px;">
-                                    <div>${badgesHTML}</div>
+                                    <div>${dualMediaBadge}${badgesHTML}</div>
                                 </div>
                             </div>
 
@@ -1288,30 +1368,94 @@
             }
         }
 
+        let detectDebounceTimer = null;
         function autoDetectSourceType() {
-            const urlVal = document.getElementById('capSourceUrl')?.value || '';
-            const textVal = document.getElementById('capText')?.value || '';
-            const combined = (urlVal + ' ' + textVal).toLowerCase();
-            const videoRegex = /https?:\/\/(?:www\.)?(?:youtube\.com|youtu\.be|vimeo\.com|tiktok\.com|instagram\.com\/reel|[\w\.-]+\/(?:[^\s]+\.(?:mp4|mov|webm|avi|mkv)))/i;
-            
-            const sourceTypeSelect = document.getElementById('capSourceType');
-            if (!sourceTypeSelect) return;
+            const urlVal = (document.getElementById('capSourceUrl')?.value || '').trim();
+            const textVal = (document.getElementById('capText')?.value || '').trim();
+            const combined = (urlVal + ' ' + textVal);
+            const videoRegex = /https?:\/\/(?:www\.)?(?:youtube\.com\/(?:[^\s/]+\/|(?:v|e(?:mbed)?|shorts)\/|.*[?&]v=)|youtu\.be\/|vimeo\.com\/|tiktok\.com\/@[^/]+\/video\/|instagram\.com\/reel\/|[\w\.-]+\/(?:[^\s]+\.(?:mp4|mov|webm|avi|mkv)))[^\s]*/i;
+            const match = combined.match(videoRegex);
 
-            if (videoRegex.test(combined) || combined.includes('סרטון') || combined.includes('יוטיוב')) {
+            const sourceTypeSelect = document.getElementById('capSourceType');
+            if (match && sourceTypeSelect) {
                 sourceTypeSelect.value = 'video';
+            }
+
+            if (match) {
+                const detectedUrl = match[0];
+                clearTimeout(detectDebounceTimer);
+                detectDebounceTimer = setTimeout(async () => {
+                    const badgeEl = document.getElementById('videoDetectBadge');
+                    if (badgeEl) {
+                        badgeEl.style.display = 'block';
+                        badgeEl.innerHTML = `⏳ מזהה כותרת, תחום ותת-נושא מתוך הסרטון...`;
+                    }
+                    try {
+                        const res = await fetch(`/api/v1/utils/video-metadata?url=${encodeURIComponent(detectedUrl)}`);
+                        if (res.ok) {
+                            const data = await res.json();
+                            const titleInput = document.getElementById('capTitle');
+                            if (titleInput && (!titleInput.value.trim() || titleInput.value.startsWith('http'))) {
+                                titleInput.value = data.title || '';
+                            }
+
+                            // Auto-set domain if not manually changed or is general
+                            const domainSelect = document.getElementById('capDomain');
+                            if (domainSelect && data.primary_domain && domainSelect.value === 'general') {
+                                domainSelect.value = data.primary_domain;
+                                renderSubTopicsForm();
+                            }
+
+                            // Check domain checkboxes
+                            if (Array.isArray(data.domains)) {
+                                data.domains.forEach(d => {
+                                    const cb = document.querySelector(`.domain-tag-cb[value="${d}"]`);
+                                    if (cb) cb.checked = true;
+                                });
+                            }
+
+                            // Check subtopic checkboxes
+                            if (Array.isArray(data.sub_topics)) {
+                                data.sub_topics.forEach(st => {
+                                    const cb = document.querySelector(`.subtopic-tag-cb[value="${st}"]`);
+                                    if (cb) cb.checked = true;
+                                });
+                            }
+
+                            if (badgeEl) {
+                                const subtopicsStr = data.sub_topics_he && data.sub_topics_he.length ? ` | 📌 תת-נושא: <b>${data.sub_topics_he.join(', ')}</b>` : '';
+                                badgeEl.innerHTML = `✨ <b>זוהה מהסרטון:</b> "${data.title}"<br>🏷️ תחום: <b>${data.primary_domain_he || data.primary_domain}</b>${subtopicsStr}`;
+                            }
+                        }
+                    } catch (err) {
+                        console.warn("Video metadata detection failed:", err);
+                        const badgeEl = document.getElementById('videoDetectBadge');
+                        if (badgeEl) badgeEl.style.display = 'none';
+                    }
+                }, 350);
+            } else {
+                const badgeEl = document.getElementById('videoDetectBadge');
+                if (badgeEl) badgeEl.style.display = 'none';
             }
         }
 
         function autoSelectInfographic() {
             const fileInput = document.getElementById('capFile');
             const noticeEl = document.getElementById('fileCountNotice');
+            const urlVal = (document.getElementById('capSourceUrl')?.value || '').trim();
+            const hasVideo = /(?:youtube\.com|youtu\.be|vimeo\.com|\.mp4)/i.test(urlVal);
+
             if (fileInput && fileInput.files && fileInput.files.length > 0) {
                 const sourceTypeSelect = document.getElementById('capSourceType');
                 if (sourceTypeSelect) {
-                    sourceTypeSelect.value = 'infographic';
+                    sourceTypeSelect.value = hasVideo ? 'video' : 'infographic';
                 }
                 if (noticeEl) {
-                    noticeEl.innerText = `✅ נבחרו ${fileInput.files.length} קבצי אינפוגרפיקה להעלאה לפריט זה`;
+                    if (hasVideo) {
+                        noticeEl.innerText = `✅ נבחרו ${fileInput.files.length} קבצי אינפוגרפיקה שיחוברו יחד עם הסרטון באותו תא!`;
+                    } else {
+                        noticeEl.innerText = `✅ נבחרו ${fileInput.files.length} קבצי אינפוגרפיקה להעלאה לפריט זה`;
+                    }
                     noticeEl.style.display = 'block';
                 }
             } else if (noticeEl) {
@@ -1592,7 +1736,10 @@
                     formData.append('files', fileInput.files[i]);
                 }
                 formData.append('title', title);
-                formData.append('source_type', source_type);
+                if (source_url) {
+                    formData.append('source_url', source_url);
+                }
+                formData.append('source_type', source_url ? 'video' : source_type);
                 formData.append('content_text', text);
                 formData.append('primary_domain', primary_domain);
                 formData.append('domains', selectedDomains.join(','));
@@ -1606,6 +1753,8 @@
                 fileInput.value = '';
                 const noticeEl = document.getElementById('fileCountNotice');
                 if (noticeEl) noticeEl.style.display = 'none';
+                const badgeEl = document.getElementById('videoDetectBadge');
+                if (badgeEl) badgeEl.style.display = 'none';
             } else {
                 await fetch('/api/v1/capture', {
                     method: 'POST',
@@ -1621,6 +1770,8 @@
                         custom_tags: selectedCustomTags
                     })
                 });
+                const badgeEl = document.getElementById('videoDetectBadge');
+                if (badgeEl) badgeEl.style.display = 'none';
             }
 
             document.getElementById('capTitle').value = '';

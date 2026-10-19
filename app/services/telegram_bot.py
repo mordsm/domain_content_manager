@@ -12,6 +12,7 @@ import httpx
 from app.config import settings
 from app.domain.capture import capture_engine
 from app.domain.obsidian_sync import obsidian_sync_engine
+from app.services.video_metadata import extract_video_url_from_text, fetch_video_metadata
 
 if hasattr(sys.stdout, 'reconfigure'):
     sys.stdout.reconfigure(encoding='utf-8')
@@ -582,23 +583,43 @@ def process_telegram_update(bot_token: str, update: dict):
             return
 
     # --- 4. DEFAULT FALLBACK: UNPREFIXED MESSAGES / MEDIA ---
-    source_url = None
+    video_url = extract_video_url_from_text(raw_text or "")
+    
+    combined_sources = []
+    if video_url:
+        combined_sources.append(video_url)
     if saved_urls:
-        source_url = saved_urls[0] if len(saved_urls) == 1 else json.dumps(saved_urls, ensure_ascii=False)
-    elif raw_text.startswith("http://") or raw_text.startswith("https://"):
-        source_url = raw_text.split()[0]
-        if any(v in source_url for v in ["youtube.com", "youtu.be", "vimeo.com"]):
-            source_type = "video"
-        elif any(p in source_url for p in ["podcast", "spotify.com"]):
-            source_type = "podcast"
-        else:
-            source_type = "article"
+        combined_sources.extend(saved_urls)
 
-    title_text = raw_text.strip().split("\n")[0] if raw_text else "פריט חדש מטלגרם"
-    if len(title_text) > 80:
-        title_text = title_text[:77] + "..."
+    if not combined_sources and raw_text and (raw_text.startswith("http://") or raw_text.startswith("https://")):
+        combined_sources.append(raw_text.split()[0])
 
-    if not title_text and saved_urls:
+    source_url = None
+    if len(combined_sources) > 1:
+        source_url = json.dumps(combined_sources, ensure_ascii=False)
+    elif len(combined_sources) == 1:
+        source_url = combined_sources[0]
+
+    # Resolve source_type
+    if video_url and saved_urls:
+        source_type = "video"
+    elif video_url:
+        source_type = "video"
+    elif saved_urls:
+        source_type = "infographic"
+    elif source_url and any(p in source_url for p in ["podcast", "spotify.com"]):
+        source_type = "podcast"
+    elif source_url:
+        source_type = "article"
+    else:
+        source_type = "note"
+
+    title_text = raw_text.strip().split("\n")[0] if raw_text else None
+    # If title is just a raw URL, set to None so capture_engine auto-fetches the real video title!
+    if title_text and (title_text.startswith("http://") or title_text.startswith("https://")):
+        title_text = None
+
+    if not title_text and saved_urls and not video_url:
         title_text = f"תמונה מטלגרם ({len(saved_urls)} קבצים)"
 
     # Capture record into DB & Vault
@@ -606,6 +627,7 @@ def process_telegram_update(bot_token: str, update: dict):
         title=title_text,
         content_text=raw_text or "נלכד דרך Telegram Bot",
         source_url=source_url,
+        original_media_url=saved_urls[0] if saved_urls else None,
         source_type=source_type,
         workspace_id=os.getenv("DEFAULT_WORKSPACE", "default_ws"),
         owner_id=os.getenv("DEFAULT_OWNER", "default_owner"),
@@ -617,9 +639,13 @@ def process_telegram_update(bot_token: str, update: dict):
     # Also log in daily log
     append_to_llm_wiki_daily_log(f"נלכד פריט מטלגרם: [[{record.title}]] ({record.source_type})")
 
+    sub_topics_list = json.loads(record.sub_topics_json) if record.sub_topics_json else []
+    sub_topics_txt = f"\n📌 *תת-נושא:* {', '.join(sub_topics_list)}" if sub_topics_list else ""
+    dual_badge = "\n🖼️ *אינפוגרפיקה וסרטון חוברו יחד באותו תא!*" if (video_url and saved_urls) else ""
+
     reply_text = f"""✅ *הפריט נשמר בהצלחה בכספת!*
 📌 *כותרת:* {record.title}
-📂 *תחום:* {record.primary_domain}
+📂 *תחום:* {record.primary_domain}{sub_topics_txt}{dual_badge}
 🏷️ *סוג:* {record.source_type}
 
 💡 _טיפ: ניתן לנתב פריטים באמצעות פקודות: /decision, /note, /research, /ask, /cook ועוד. שלח /help לפירוט._"""

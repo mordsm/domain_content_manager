@@ -43,8 +43,9 @@ class ObsidianSyncEngine:
         sub_topics = json.loads(record.sub_topics_json) if getattr(record, "sub_topics_json", None) else []
         custom_tags = json.loads(record.custom_tags_json) if getattr(record, "custom_tags_json", None) else []
 
-        # Media / Infographics embedding
+        # Media & Video embedding
         media_embeds: List[str] = []
+        video_links: List[str] = []
         if record.source_url:
             try:
                 urls = json.loads(record.source_url)
@@ -54,10 +55,17 @@ class ObsidianSyncEngine:
                 urls = [record.source_url]
 
             for u in urls:
-                if u and (record.source_type == "infographic" or u.startswith("/data/uploads/") or any(u.lower().endswith(ext) for ext in [".jpg", ".jpeg", ".png", ".webp", ".gif"])):
+                if not u:
+                    continue
+                if any(v in u.lower() for v in ["youtube.com", "youtu.be", "vimeo.com", "tiktok.com", ".mp4", ".mov", ".webm"]):
+                    video_links.append(f"- 🎬 [צפה בסרטון המלא]({u})")
+                    if "youtube.com" in u or "youtu.be" in u:
+                        video_links.append(f"`youtube: {u}`")
+                elif u.startswith("/data/uploads/") or any(u.lower().endswith(ext) for ext in [".jpg", ".jpeg", ".png", ".webp", ".gif"]):
                     media_embeds.append(f"![{record.title}]({u})")
 
-        media_section = "\n".join(media_embeds) if media_embeds else ""
+        media_section = "\n".join(media_embeds) if media_embeds else "אין קבצי תמונה מצורפים."
+        video_section = "\n".join(video_links) if video_links else "אין סרטון מקושר."
 
         yaml_frontmatter = f"""---
 id: "{record.id}"
@@ -70,6 +78,8 @@ sub_topics: {json.dumps(sub_topics, ensure_ascii=False)}
 custom_tags: {json.dumps(custom_tags, ensure_ascii=False)}
 source_type: "{record.source_type}"
 source_url: "{record.source_url or ''}"
+has_video: {str(bool(video_links)).lower()}
+has_infographics: {str(bool(media_embeds)).lower()}
 status: "{record.status}"
 reliability_layer: "{record.reliability_layer}"
 risk_level: "{record.risk_level}"
@@ -82,8 +92,11 @@ created_at: "{record.created_at}"
 ## 📌 תקציר (Summary)
 {record.summary or 'אין תקציר עדיין.'}
 
+## 🎥 סרטון ומקור (Video & Source)
+{video_section}
+
 ## 🖼️ אינפוגרפיקות ותמונות (Infographics)
-{media_section if media_section else 'אין קבצי תמונה מצורפים'}
+{media_section}
 
 ## 🏷️ מילות מפתח שנשאבו (Mined Keywords)
 {', '.join([f'#{k}' for k in keywords]) if keywords else 'אין מילות מפתח'}

@@ -17,6 +17,7 @@ from app.domain.obsidian_sync import obsidian_sync_engine
 from app.domain.cook_pilot import cook_pilot_engine
 from app.config import settings
 from app.services.config_service import domain_config_manager
+from app.services.video_metadata import fetch_video_metadata
 
 router = APIRouter(prefix="/api/v1")
 
@@ -24,6 +25,16 @@ router = APIRouter(prefix="/api/v1")
 def get_domains_config():
     """Returns the dynamic domains and sub-topics configuration from domains.yaml."""
     return domain_config_manager.get_domains_dict()
+
+@router.get("/utils/video-metadata")
+def get_video_metadata(url: str):
+    """
+    Fetches real video title, thumbnail, and auto-classifies domain and sub-topic.
+    """
+    if not url or not url.strip():
+        raise HTTPException(status_code=400, detail="Missing URL parameter")
+    meta = fetch_video_metadata(url.strip())
+    return meta
 
 @router.post("/capture")
 def capture_content(req: ContentCaptureRequest):
@@ -48,6 +59,7 @@ async def upload_file_capture(
     file: Optional[UploadFile] = File(None),
     title: Optional[str] = Form(None),
     content_text: Optional[str] = Form(None),
+    source_url: Optional[str] = Form(None),
     source_type: str = Form("infographic"),
     primary_domain: str = Form("general"),
     domains: Optional[str] = Form(None),
@@ -63,8 +75,8 @@ async def upload_file_capture(
     if file and file.filename and file not in upload_list:
         upload_list.append(file)
 
-    if not upload_list:
-        raise HTTPException(status_code=400, detail="לא נשלח קובץ להעלאה")
+    if not upload_list and not (source_url and source_url.strip()):
+        raise HTTPException(status_code=400, detail="לא נשלח קובץ או קישור לקליטה")
 
     saved_urls = []
     file_names = []
@@ -79,21 +91,36 @@ async def upload_file_capture(
             
         saved_urls.append(f"/data/uploads/{unique_filename}")
         file_names.append(item.filename)
-        
-    web_url = saved_urls[0] if len(saved_urls) == 1 else json.dumps(saved_urls, ensure_ascii=False)
+
+    # Combine video source_url with uploaded files so both coexist in the same cell
+    combined_sources = []
+    if source_url and source_url.strip():
+        combined_sources.append(source_url.strip())
+    combined_sources.extend(saved_urls)
+
+    web_url = combined_sources[0] if len(combined_sources) == 1 else json.dumps(combined_sources, ensure_ascii=False)
     
     parsed_domains = [d.strip() for d in domains.split(",")] if domains and domains.strip() else []
     parsed_sub_topics = [st.strip() for st in sub_topics.split(",")] if sub_topics and sub_topics.strip() else []
     parsed_tags = [t.strip() for t in custom_tags.split(",")] if custom_tags and custom_tags.strip() else []
     
     count_str = f" ({len(saved_urls)} קבצים)" if len(saved_urls) > 1 else ""
-    record_title = title or f"אינפוגרפיקה: {', '.join(file_names[:2])}{count_str}"
+    record_title = title
+    if not record_title:
+        if file_names:
+            record_title = f"אינפוגרפיקה: {', '.join(file_names[:2])}{count_str}"
+        elif source_url:
+            record_title = None  # Will auto-fetch from video title
+        else:
+            record_title = "רשומה חדשה"
+
     record_text = content_text or ""
     
     record = capture_engine.capture_text_or_url(
         title=record_title,
         content_text=record_text,
         source_url=web_url,
+        original_media_url=saved_urls[0] if saved_urls else None,
         source_type=source_type,
         workspace_id=workspace_id,
         owner_id=owner_id,
@@ -109,7 +136,9 @@ async def upload_file_capture(
         "title": record.title,
         "files_count": len(saved_urls),
         "file_urls": saved_urls,
-        "domain": record.primary_domain
+        "source_url": record.source_url,
+        "domain": record.primary_domain,
+        "sub_topics": parsed_sub_topics
     }
 
 @router.post("/capture/voice")

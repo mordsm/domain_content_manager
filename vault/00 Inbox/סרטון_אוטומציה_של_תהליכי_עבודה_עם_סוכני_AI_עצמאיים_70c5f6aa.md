@@ -8,7 +8,7 @@ domains: ["AI"]
 sub_topics: ["automation"]
 custom_tags: ["אוטומציה", "מומלץ"]
 source_type: "video"
-source_url: "https://youtube.com/watch?v=ai_automation_agents"
+source_url: "https://www.youtube.com/watch?v=-RTgK6qX6A8"
 status: "inbox"
 reliability_layer: "research"
 risk_level: "none"

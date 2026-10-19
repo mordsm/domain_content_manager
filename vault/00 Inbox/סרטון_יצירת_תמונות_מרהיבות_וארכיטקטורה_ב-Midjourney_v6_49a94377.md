@@ -8,7 +8,7 @@ domains: ["AI"]
 sub_topics: ["models", "tips"]
 custom_tags: ["וידאו", "עיצוב"]
 source_type: "video"
-source_url: "https://youtube.com/watch?v=midjourney_v6_tutorial"
+source_url: "https://www.youtube.com/watch?v=C-84RJGNwPo"
 status: "inbox"
 reliability_layer: "research"
 risk_level: "none"

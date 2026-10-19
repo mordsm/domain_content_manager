@@ -5,6 +5,12 @@ __pycache__/
 data/uploads/*
 !data/uploads/.gitkeep
 data/*.db
+content_manager.db
+scratch/
+_run_temp.bat
+scratch_script.js
 *.sqlite
 .env
+vault/00 Inbox/*
+!vault/00 Inbox/.gitkeep
 

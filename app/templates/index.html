@@ -10,7 +10,7 @@
         body {
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
             margin: 0;
-            padding: 0;
+            padding: 0 0 120px;
             background: #090d16;
             color: #f8fafc;
             min-height: 100vh;
@@ -150,6 +150,66 @@
         }
         .btn-detail:hover { background: #0284c7; color: #fff; }
 
+        #mediaStage {
+            display: none;
+            position: fixed;
+            inset: 0;
+            z-index: 4000;
+            background: #000;
+            color: #e2e8f0;
+            flex-direction: column;
+        }
+        #mediaStage.open { display: flex; }
+        #mediaStageFrame {
+            flex: 1;
+            min-height: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 64px 16px 132px;
+        }
+        #mediaStageFrame img,
+        #mediaStageFrame video {
+            max-width: 100%;
+            max-height: 100%;
+            object-fit: contain;
+        }
+        #mediaStageFrame iframe {
+            width: min(100%, 1280px);
+            height: min(100%, 720px);
+            border: 0;
+            background: #000;
+        }
+        .media-stage-bar {
+            position: absolute;
+            left: 0;
+            right: 0;
+            display: flex;
+            gap: 8px;
+            align-items: center;
+            padding: 10px 14px;
+            background: linear-gradient(to bottom, rgba(0,0,0,0.82), rgba(0,0,0,0));
+        }
+        .media-stage-bar.bottom {
+            bottom: 0;
+            top: auto;
+            background: linear-gradient(to top, rgba(0,0,0,0.9), rgba(0,0,0,0.35));
+            flex-wrap: wrap;
+        }
+        .media-stage-bar button {
+            background: rgba(15, 23, 42, 0.9);
+            color: #e2e8f0;
+            border: 1px solid #334155;
+            border-radius: 999px;
+            padding: 8px 14px;
+            font-weight: 700;
+            cursor: pointer;
+        }
+        .media-stage-bar button:hover { border-color: #38bdf8; color: #fff; }
+        #mediaStageTopics { display: flex; gap: 6px; flex-wrap: wrap; width: 100%; }
+        #mediaStageTopics button.active { background: #0284c7; border-color: #38bdf8; color: #fff; }
+        #mediaVoiceStatus { font-size: 0.92rem; color: #7dd3fc; }
+
         .domain-tabs {
             display: flex;
             gap: 8px;
@@ -181,6 +241,50 @@
             grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
             gap: 1.25rem;
         }
+        .record-card.voice-current {
+            outline: 3px solid #38bdf8;
+            box-shadow: 0 0 0 4px rgba(56, 189, 248, 0.25);
+        }
+        #siteVoice {
+            position: fixed;
+            right: 16px;
+            bottom: 16px;
+            left: 16px;
+            z-index: 4500;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            align-items: center;
+            padding: 10px 12px;
+            background: rgba(2, 6, 23, 0.94);
+            border: 1px solid #0284c7;
+            border-radius: 14px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.35);
+        }
+        #siteVoice button {
+            background: #0f172a;
+            color: #e2e8f0;
+            border: 1px solid #334155;
+            border-radius: 999px;
+            padding: 7px 12px;
+            font-weight: 700;
+            cursor: pointer;
+        }
+        #siteVoice button.active, #mediaStageTopics button.active { background: #0284c7; border-color: #38bdf8; color: #fff; }
+        #siteVoiceTopics { display: flex; gap: 6px; flex-wrap: wrap; width: 100%; }
+        #siteVoiceStatus { color: #7dd3fc; font-size: 0.92rem; flex: 1; min-width: 180px; }
+        #siteCameraPreview {
+            display: none;
+            width: 168px;
+            height: 126px;
+            object-fit: cover;
+            border-radius: 10px;
+            border: 3px solid #34d399;
+            background: #000;
+            transform: scaleX(-1);
+        }
+        #siteCameraPreview.live { display: block; }
+
         .record-card {
             background: #1e293b;
             border: 1px solid #334155;
@@ -260,6 +364,7 @@
         .badge-foraging { background: rgba(168, 85, 247, 0.2); color: #c084fc; border: 1px solid #a855f7; }
         .badge-mental { background: rgba(139, 92, 246, 0.2); color: #a78bfa; border: 1px solid #8b5cf6; }
         .badge-financial { background: rgba(16, 185, 129, 0.2); color: #34d399; border: 1px solid #10b981; }
+        .badge-exercise { background: rgba(249, 115, 22, 0.2); color: #fb923c; border: 1px solid #f97316; }
         .badge-general { background: rgba(148, 163, 184, 0.2); color: #cbd5e1; border: 1px solid #94a3b8; }
 
         .risk-banner {
@@ -658,6 +763,7 @@
                 <button class="tab-btn" onclick="filterDomain('foraging', this)">🍄 ליקוט</button>
                 <button class="tab-btn" onclick="filterDomain('mental', this)">🧠 מנטלי</button>
                 <button class="tab-btn" onclick="filterDomain('financial', this)">💰 כלכלי</button>
+                <button class="tab-btn" onclick="filterDomain('exercise', this)">🏋️ אימון</button>
             </div>
 
             <!-- SUB-TOPICS FILTER BAR -->
@@ -748,6 +854,29 @@
         </main>
     </div>
 
+    <div id="siteVoice">
+        <button type="button" id="siteVoiceToggle" onclick="startSiteVoice(true)">🎤 הפעל קול</button>
+        <button type="button" id="siteCameraToggle" onclick="toggleSiteCamera()">📷 הפעל מצלמה</button>
+        <video id="siteCameraPreview" autoplay playsinline muted></video>
+        <span id="siteVoiceStatus">הקול מנווט מהכניסה: תחום, תת-נושא, הבא, הקודם, פתח, סגור</span>
+        <div id="siteVoiceTopics"></div>
+    </div>
+
+    <div id="mediaStage" role="dialog" aria-modal="true" aria-label="תצוגת מסך מלא">
+        <div class="media-stage-bar">
+            <button type="button" onclick="closeMediaStage()">✕ סגור</button>
+            <strong id="mediaStageTitle" style="flex:1; min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;"></strong>
+            <span id="mediaStageCount"></span>
+        </div>
+        <div id="mediaStageFrame"></div>
+        <div class="media-stage-bar bottom">
+            <button type="button" onclick="stepMediaStage(-1)">הקודם</button>
+            <button type="button" onclick="stepMediaStage(1)">הבא</button>
+            <span id="mediaVoiceStatus">מקשיב לפקודות קול</span>
+            <div id="mediaStageTopics"></div>
+        </div>
+    </div>
+
     <!-- DETAIL & EDIT MODAL -->
     <div class="modal-overlay" id="detailModal">
         <div class="modal-card">
@@ -784,6 +913,14 @@
     <script>
         let currentDomain = 'all';
         let currentSubTopic = 'all';
+        let mediaStageOpen = false;
+        let mediaStageIndex = 0;
+        let mediaStageReset = false;
+        let mediaVoiceWanted = false;
+        let mediaRecognition = null;
+        let voiceRecordIndex = 0;
+        let voiceListReset = false;
+        let siteVoiceGreeted = false;
         let selectedRecordIds = new Set();
         let currentRecords = [];
         let domainConfig = {};
@@ -841,9 +978,7 @@
 
         function isVideoRecord(r) {
             if (!r) return false;
-            if (r.source_type === 'video') return true;
-            const urls = getParsedSourceUrls(r.source_url);
-            return urls.some(u => typeof u === 'string' && /(?:youtube\.com|youtu\.be|vimeo\.com|\.mp4)/i.test(u));
+            return getParsedSourceUrls(r.source_url).some(isEmbeddableVideoUrl);
         }
 
         function getWebPageUrl(r) {
@@ -892,44 +1027,12 @@
             return vidId ? `https://www.youtube.com/embed/${vidId}` : null;
         }
 
-        function playVideoFromCard(id, element) {
+        function playVideoFromCard(id) {
             const r = currentRecords.find(item => String(item.id) === String(id));
             if (!r) return;
             const urls = getParsedSourceUrls(r.source_url);
-            
-            let ytId = null;
-            let otherVideoUrl = null;
-            for (const u of urls) {
-                if (typeof u === 'string') {
-                    const matchedId = getYouTubeVideoId(u);
-                    if (matchedId) {
-                        ytId = matchedId;
-                        break;
-                    }
-                    if (/facebook\.com|vimeo\.com|\.mp4/i.test(u)) {
-                        otherVideoUrl = u;
-                    }
-                }
-            }
-
-            if (ytId) {
-                element.innerHTML = `
-                    <iframe 
-                        src="https://www.youtube.com/embed/${ytId}?autoplay=1&rel=0" 
-                        style="width:100%; height:100%; border:0; border-radius:8px;" 
-                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
-                        allowfullscreen>
-                    </iframe>
-                `;
-                element.style.background = '#000';
-                element.style.cursor = 'default';
-                element.removeAttribute('title');
-                element.onclick = (e) => e.stopPropagation();
-            } else if (otherVideoUrl) {
-                window.open(otherVideoUrl, '_blank');
-            } else {
-                openDetailModal(id);
-            }
+            const videoUrl = urls.find(u => typeof u === 'string' && /(?:youtube\.com|youtu\.be|vimeo\.com|\.mp4|\.webm)/i.test(u)) || '';
+            openMediaStageFor(id, 'video', videoUrl);
         }
 
         function switchCellMedia(recordId, type) {
@@ -1117,10 +1220,12 @@
                 renderSubTopicFilterBar();
                 injectDynamicBadgeCSS();
                 checkSharedUrlParams();
-                fetchRecords();
+                await fetchRecords();
+                startSiteVoice(false);
             } catch (err) {
                 console.error("Failed to load domain config from YAML:", err);
-                fetchRecords();
+                await fetchRecords();
+                startSiteVoice(false);
             }
         }
 
@@ -1196,6 +1301,7 @@
                 const container = document.getElementById('recordsContainer');
                 if (currentRecords.length === 0) {
                     container.innerHTML = `<p style="color:#94a3b8;">אין רשומות בתחום זה עדיין.</p>`;
+                    settleVoiceList();
                     return;
                 }
 
@@ -1224,7 +1330,7 @@
                     }).join('');
 
                     const allSourceUrls = getParsedSourceUrls(r.source_url);
-                    const videoUrl = allSourceUrls.find(u => typeof u === 'string' && /(?:youtube\.com|youtu\.be|vimeo\.com|\.mp4)/i.test(u)) || (isVideoRecord(r) ? allSourceUrls[0] : null);
+                    const videoUrl = allSourceUrls.find(isEmbeddableVideoUrl) || '';
                     const imageUrls = allSourceUrls.filter(u => typeof u === 'string' && (u.startsWith('/data/uploads/') || /\.(jpg|jpeg|png|webp|gif)$/i.test(u)));
                     if (r.original_media_url && !imageUrls.includes(r.original_media_url) && !/(?:youtube\.com|youtu\.be)/i.test(r.original_media_url)) {
                         imageUrls.unshift(r.original_media_url);
@@ -1261,7 +1367,7 @@
                                         🎥 לחץ לנגינה
                                     </div>
                                 </div>
-                                <div id="media-view-img-${r.id}" class="cover-image-box" style="display:none; position:relative; cursor:pointer; margin-bottom:0; border:none; border-radius:0;" onclick="openDetailModal('${r.id}')" title="🔍 לחץ לצפייה מלאה באינפוגרפיקה">
+                                <div id="media-view-img-${r.id}" class="cover-image-box" style="display:none; position:relative; cursor:pointer; margin-bottom:0; border:none; border-radius:0;" onclick="event.stopPropagation(); openMediaStageFor('${r.id}', 'image', '${encodeURIComponent(imageUrls[0] || '')}')" title="🔍 לחץ לצפייה מלאה באינפוגרפיקה">
                                     <img src="${imageUrls[0]}" alt="${r.title}">
                                     <div style="position:absolute; bottom:8px; right:8px; background:rgba(15,23,42,0.9); color:#10b981; font-size:0.72rem; font-weight:bold; padding:2px 8px; border-radius:4px; border:1px solid rgba(16,185,129,0.4);">
                                         📊 אינפוגרפיקה (1 מתוך ${imageUrls.length})
@@ -1294,7 +1400,15 @@
                                 </div>
                             `;
                         } else {
-                            clickHandler = `onclick="event.stopPropagation(); openDetailModal('${r.id}')"`;
+                            clickHandler = `onclick="event.stopPropagation(); openMediaStageFor('${r.id}', 'image', '${encodeURIComponent(coverUrl)}')"`;
+                            if (imageUrls.length > 1) {
+                                tooltip = `תמונה 1 מתוך ${imageUrls.length}. הבא עובר לתמונה הבאה בפריט`;
+                                badgeOverlay = `
+                                    <div style="position:absolute; bottom:8px; right:8px; background:rgba(15,23,42,0.9); color:#34d399; font-size:0.72rem; font-weight:bold; padding:2px 8px; border-radius:4px; border:1px solid rgba(16,185,129,0.4);">
+                                        📊 1 מתוך ${imageUrls.length}
+                                    </div>
+                                `;
+                            }
                         }
 
                         const fallbackAttr = isWebPage ? `onerror="if(!this.dataset.fallback){this.dataset.fallback=1; this.src='https://image.thum.io/get/width/650/crop/400/${encodeURI(webUrl)}';}"` : '';
@@ -1322,7 +1436,7 @@
                     const dualMediaBadge = isDualMedia ? `<span style="background:linear-gradient(135deg, rgba(2,132,199,0.35), rgba(16,185,129,0.35)); border:1px solid #0284c7; color:#38bdf8; font-size:0.75rem; font-weight:bold; padding:2px 8px; border-radius:12px; margin-left:4px;">🎥 סרטון + 📊 אינפוגרפיקה</span>` : '';
 
                     return `
-                        <div class="record-card" onclick="openDetailModal('${r.id}')">
+                        <div class="record-card" id="record-${r.id}" onclick="openDetailModal('${r.id}')">
                             ${coverHeaderHTML}
 
                             ${r.risk_level === 'high' ? `<div class="risk-banner">⚠️ <b>רמת סיכון גבוהה</b></div>` : ''}
@@ -1359,6 +1473,7 @@
                         </div>
                     `;
                 }).join('');
+                settleVoiceList();
             } catch (err) {
                 console.error("Error fetching records:", err);
                 const container = document.getElementById('recordsContainer');
@@ -1464,20 +1579,16 @@
         }
 
         function renderImageGallery(r, isModal = false) {
-            const urls = getParsedSourceUrls(r.source_url);
-            if (!urls.length) return '';
-
-            const isMedia = r.source_type === 'infographic' || urls.some(u => typeof u === 'string' && (u.startsWith('/data/uploads/') || /\.(jpg|jpeg|png|webp|gif)$/i.test(u)));
-            if (!isMedia) return '';
-
+            const imgs = recordImageUrls(r);
+            if (!imgs.length) return '';
             const maxH = isModal ? '450px' : '220px';
-            const imgsHTML = urls.map(u => `<a href="${u}" target="_blank" rel="noopener noreferrer" onclick="event.stopPropagation()"><img src="${u}" alt="${r.title}" style="max-width:100%; max-height:${maxH}; border-radius:8px; border:1px solid #0284c7; object-fit:contain; cursor:pointer;" title="לחץ להצגה מלאה של הקובץ"></a>`).join('');
-            
-            const countBadge = urls.length > 1 ? `<div style="font-size:0.8rem; color:#38bdf8; margin-bottom:6px; font-weight:bold;">📊 גלריית אינפוגרפיקות (${urls.length} תמונות בפריט - לחץ על תמונה להגדלה):</div>` : '';
-
+            const first = imgs[0];
+            const countBadge = imgs.length > 1
+                ? `<div style="font-size:0.8rem; color:#38bdf8; margin-bottom:6px; font-weight:bold;">📊 ${imgs.length} תמונות בפריט, אחת אחרי השנייה. הבא עובר לתמונה הבאה.</div>`
+                : '';
             return `<div style="margin-top:10px; text-align:center; background:#020617; padding:10px; border-radius:8px; border:1px solid #1e293b;">
                 ${countBadge}
-                <div style="display:flex; flex-wrap:wrap; gap:10px; justify-content:center; align-items:center;">${imgsHTML}</div>
+                <img src="${first}" alt="${r.title}" style="max-width:100%; max-height:${maxH}; border-radius:8px; border:1px solid #0284c7; object-fit:contain; cursor:pointer;" title="לחץ לתצוגת מסך מלא" onclick="event.stopPropagation(); openMediaStageFor('${r.id}', 'image', '${encodeURIComponent(first)}')">
             </div>`;
         }
 
@@ -1546,6 +1657,7 @@
 
         function filterSubTopic(subKey, btnElement) {
             currentSubTopic = subKey;
+            voiceBrowsingItems = subKey !== 'all';
             document.querySelectorAll('#subTopicFilterButtons .tab-btn').forEach(btn => btn.classList.remove('active'));
             if (btnElement) btnElement.classList.add('active');
             const activeLabel = document.getElementById('activeSubTopicLabel');
@@ -1558,6 +1670,7 @@
         function filterDomain(domain, btnElement) {
             currentDomain = domain;
             currentSubTopic = 'all';
+            voiceBrowsingItems = false;
             document.querySelectorAll('.domain-tabs .tab-btn').forEach(btn => btn.classList.remove('active'));
             if (btnElement) {
                 btnElement.classList.add('active');
@@ -1565,6 +1678,1056 @@
             renderSubTopicFilterBar();
             fetchRecords();
         }
+
+        function normalizeVoice(text) {
+            return String(text || '')
+                .replace(/[\u0591-\u05C7]/g, '')
+                .replace(/[^\u0590-\u05FFa-z0-9\s]/gi, ' ')
+                .replace(/\s+/g, ' ')
+                .trim()
+                .toLowerCase();
+        }
+
+        function isImageUrl(url) {
+            return typeof url === 'string' && (url.startsWith('/data/uploads/') || /\.(jpg|jpeg|png|webp|gif)(\?|$)/i.test(url));
+        }
+
+        function isEmbeddableVideoUrl(url) {
+            return typeof url === 'string' && /(?:youtube\.com|youtu\.be|vimeo\.com|\.mp4|\.webm)(?:\?|$|\/)/i.test(url);
+        }
+
+        function recordImageUrls(record) {
+            const urls = getParsedSourceUrls(record.source_url).filter(isImageUrl);
+            if (record.original_media_url && isImageUrl(record.original_media_url) && !urls.includes(record.original_media_url)) {
+                urls.unshift(record.original_media_url);
+            }
+            return urls;
+        }
+
+        function recordVideoUrl(record) {
+            return getParsedSourceUrls(record.source_url).find(isEmbeddableVideoUrl) || '';
+        }
+
+        function buildMediaPlaylist() {
+            const items = [];
+            currentRecords.forEach(record => {
+                const videoUrl = recordVideoUrl(record);
+                if (videoUrl) {
+                    items.push({ recordId: String(record.id), kind: 'video', url: videoUrl, title: record.title || 'סרטון' });
+                }
+                recordImageUrls(record).forEach(url => {
+                    items.push({ recordId: String(record.id), kind: 'image', url, title: record.title || 'אינפוגרפיקה' });
+                });
+            });
+            return items;
+        }
+
+        function mediaEmbed(item) {
+            const ytId = getYouTubeVideoId(item.url);
+            if (ytId) {
+                return `<iframe src="https://www.youtube.com/embed/${ytId}?autoplay=1&rel=0" allow="autoplay; encrypted-media; picture-in-picture; fullscreen" allowfullscreen></iframe>`;
+            }
+            const vimeo = String(item.url).match(/vimeo\.com\/(?:video\/)?(\d+)/i);
+            if (vimeo) {
+                return `<iframe src="https://player.vimeo.com/video/${vimeo[1]}?autoplay=1" allow="autoplay; fullscreen" allowfullscreen></iframe>`;
+            }
+            if (/\.(mp4|webm)(\?|$)/i.test(item.url)) {
+                return `<video src="${item.url}" controls autoplay playsinline></video>`;
+            }
+            if (item.kind === 'image' || isImageUrl(item.url)) {
+                return `<img src="${item.url}" alt="${item.title || ''}">`;
+            }
+            return '';
+        }
+
+        function renderVoiceChoices() {
+            let html = '';
+            if (currentDomain === 'all') {
+                html = Object.entries(domainConfig || {})
+                    .filter(([key]) => key !== 'general')
+                    .map(([key, info]) => `<button type="button" onclick="chooseMediaDomain('${key}')">${info.icon || ''} ${info.label_he || key}</button>`)
+                    .join('');
+            } else {
+                const entries = Object.entries((domainConfig[currentDomain] || {}).sub_topics || {});
+                html = `<button type="button" onclick="chooseMediaDomain('all')">הכל</button>` + entries.map(([key, info]) => {
+                    const active = currentSubTopic === key ? 'active' : '';
+                    return `<button type="button" class="${active}" onclick="chooseMediaSubTopic('${key}')">${info.label_he || key}</button>`;
+                }).join('');
+            }
+            ['mediaStageTopics', 'siteVoiceTopics'].forEach(id => {
+                const box = document.getElementById(id);
+                if (box) box.innerHTML = html;
+            });
+        }
+
+        function renderMediaTopics() {
+            renderVoiceChoices();
+        }
+
+        function highlightVoiceRecord(scrollIntoView) {
+            document.querySelectorAll('.record-card.voice-current').forEach(card => card.classList.remove('voice-current'));
+            const record = currentRecords[voiceRecordIndex];
+            if (!record) return;
+            const card = document.getElementById(`record-${record.id}`);
+            if (!card) return;
+            card.classList.add('voice-current');
+            if (scrollIntoView) card.scrollIntoView({ block: 'center', behavior: 'smooth' });
+        }
+
+        function mediaPartsOf(recordId) {
+            return buildMediaPlaylist()
+                .map((item, index) => ({ ...item, index }))
+                .filter(item => item.recordId === String(recordId));
+        }
+
+        function advanceVoice(delta) {
+            voiceBrowsingItems = true;
+            if (!currentRecords.length) {
+                setMediaVoiceStatus('אין פריטים ברשימה');
+                speakMedia('אין פריטים ברשימה');
+                return;
+            }
+            const record = currentRecords[voiceRecordIndex];
+            const parts = record ? mediaPartsOf(record.id) : [];
+            if (mediaStageOpen && parts.length) {
+                const currentPart = parts.findIndex(part => part.index === mediaStageIndex);
+                const nextPart = currentPart + delta;
+                if (nextPart >= 0 && nextPart < parts.length) {
+                    openMediaStage(parts[nextPart].index);
+                    setMediaVoiceStatus(`חלק ${nextPart + 1} מתוך ${parts.length} באותו פריט`);
+                    return;
+                }
+            }
+            voiceRecordIndex = (voiceRecordIndex + delta + currentRecords.length) % currentRecords.length;
+            highlightVoiceRecord(true);
+            const next = currentRecords[voiceRecordIndex];
+            if (mediaStageOpen) {
+                const nextParts = mediaPartsOf(next.id);
+                if (nextParts.length) {
+                    const part = delta > 0 ? nextParts[0] : nextParts[nextParts.length - 1];
+                    openMediaStage(part.index);
+                    setMediaVoiceStatus(next.title);
+                    return;
+                }
+                closeMediaStage(true);
+            }
+            setMediaVoiceStatus(`${voiceRecordIndex + 1} מתוך ${currentRecords.length}: ${next.title}`);
+            speakMedia(next.title);
+        }
+
+        function openFocusedRecord() {
+            const record = currentRecords[voiceRecordIndex];
+            if (!record) {
+                speakMedia('אין פריט לפתיחה');
+                return;
+            }
+            const imageUrl = recordImageUrls(record)[0];
+            const videoUrl = recordVideoUrl(record);
+            if (imageUrl) openMediaStageFor(record.id, 'image', encodeURIComponent(imageUrl));
+            else if (videoUrl) openMediaStageFor(record.id, 'video', encodeURIComponent(videoUrl));
+            else openDetailModal(record.id);
+        }
+
+        function renderMediaStage() {
+            const items = buildMediaPlaylist();
+            const frame = document.getElementById('mediaStageFrame');
+            const title = document.getElementById('mediaStageTitle');
+            const count = document.getElementById('mediaStageCount');
+            if (!frame) return;
+            if (mediaStageReset || mediaStageIndex >= items.length) mediaStageIndex = 0;
+            mediaStageReset = false;
+            if (!items.length) {
+                frame.innerHTML = `<div style="text-align:center; max-width:640px; padding:24px;"><h2>אין כאן סרטון או אינפוגרפיקה</h2><p>אמור שם של תת-נושא, או הבא אחרי בחירת תחום אחר.</p></div>`;
+                if (title) title.textContent = domainConfig[currentDomain]?.label_he || '';
+                if (count) count.textContent = '';
+                renderMediaTopics();
+                return;
+            }
+            mediaStageIndex = (mediaStageIndex + items.length) % items.length;
+            let item = items[mediaStageIndex];
+            let embed = mediaEmbed(item);
+            for (let step = 0; !embed && step < items.length; step += 1) {
+                mediaStageIndex = (mediaStageIndex + 1) % items.length;
+                item = items[mediaStageIndex];
+                embed = mediaEmbed(item);
+            }
+            frame.innerHTML = embed || '';
+            if (title) title.textContent = item.title;
+            if (count) count.textContent = `${mediaStageIndex + 1} / ${items.length}`;
+            const recordIndex = currentRecords.findIndex(record => String(record.id) === item.recordId);
+            if (recordIndex >= 0) voiceRecordIndex = recordIndex;
+            renderMediaTopics();
+        }
+
+        let humanVoice = null;
+        let voicePausedForSpeech = false;
+        let siteVoiceAudio = null;
+        let speechTurn = 0;
+
+        function refreshHumanVoice() {
+            if (!window.speechSynthesis) return;
+            const voices = speechSynthesis.getVoices();
+            const hebrew = voices.filter(voice => /^(he|iw)/i.test(voice.lang) || /עברית|hebrew/i.test(voice.name));
+            humanVoice = hebrew.find(voice => /natural|neural|online/i.test(voice.name))
+                || hebrew.find(voice => /hila|asaf|avri/i.test(voice.name))
+                || hebrew.find(voice => /google/i.test(voice.name))
+                || hebrew[0]
+                || null;
+        }
+
+        if (window.speechSynthesis) {
+            refreshHumanVoice();
+            speechSynthesis.addEventListener('voiceschanged', refreshHumanVoice);
+        }
+
+        function pauseVoiceForSpeech() {
+            voicePausedForSpeech = true;
+            try { mediaRecognition && mediaRecognition.abort(); } catch (e) {
+                try { mediaRecognition && mediaRecognition.stop(); } catch (err) {}
+            }
+        }
+
+        function resumeVoiceAfterSpeech() {
+            if (siteVoiceAudio && !siteVoiceAudio.paused) return;
+            if (window.speechSynthesis && speechSynthesis.speaking) return;
+            if (!voicePausedForSpeech) return;
+            voicePausedForSpeech = false;
+            if (!mediaVoiceWanted || !mediaRecognition) return;
+            setTimeout(() => {
+                if (voicePausedForSpeech || (siteVoiceAudio && !siteVoiceAudio.paused)) return;
+                try { mediaRecognition.start(); } catch (e) {}
+            }, 500);
+        }
+
+        function stopSpokenAudio() {
+            speechTurn += 1;
+            if (siteVoiceAudio) {
+                siteVoiceAudio.pause();
+                siteVoiceAudio = null;
+            }
+            if (window.speechSynthesis) window.speechSynthesis.cancel();
+        }
+
+        function cleanSpokenText(text) {
+            return String(text || '')
+                .replace(/אינפוגרפיקה:\s*/g, '')
+                .replace(/\.(png|jpe?g|webp|gif|mp4|webm)/gi, '')
+                .replace(/\(\s*\d+\s*קבצים\s*\)/g, '')
+                .replace(/[_/]+/g, ' ')
+                .replace(/\s+/g, ' ')
+                .trim();
+        }
+
+        function speakWithBrowserVoice(text, turn) {
+            if (!window.speechSynthesis) {
+                resumeVoiceAfterSpeech();
+                return;
+            }
+            refreshHumanVoice();
+            const utterance = new SpeechSynthesisUtterance(text);
+            utterance.lang = 'he-IL';
+            utterance.rate = 0.92;
+            utterance.pitch = 1;
+            if (humanVoice) utterance.voice = humanVoice;
+            utterance.onend = () => {
+                if (turn === speechTurn) resumeVoiceAfterSpeech();
+            };
+            utterance.onerror = () => {
+                if (turn === speechTurn) resumeVoiceAfterSpeech();
+            };
+            window.speechSynthesis.speak(utterance);
+        }
+
+        async function speakMedia(text) {
+            const spoken = cleanSpokenText(text).slice(0, 400);
+            if (!spoken) return;
+            stopSpokenAudio();
+            pauseVoiceForSpeech();
+            const turn = speechTurn;
+            try {
+                const response = await fetch('/api/v1/speech', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ text: spoken })
+                });
+                if (turn !== speechTurn) return;
+                if (response.ok) {
+                    const blob = await response.blob();
+                    if (turn !== speechTurn) return;
+                    const url = URL.createObjectURL(blob);
+                    const audio = new Audio(url);
+                    siteVoiceAudio = audio;
+                    audio.onended = () => {
+                        URL.revokeObjectURL(url);
+                        if (siteVoiceAudio === audio) {
+                            siteVoiceAudio = null;
+                            resumeVoiceAfterSpeech();
+                        }
+                    };
+                    await audio.play();
+                    return;
+                }
+            } catch (e) {}
+            if (turn === speechTurn) speakWithBrowserVoice(spoken, turn);
+            else resumeVoiceAfterSpeech();
+        }
+
+        function setMediaVoiceStatus(text) {
+            ['mediaVoiceStatus', 'siteVoiceStatus'].forEach(id => {
+                const el = document.getElementById(id);
+                if (el) el.textContent = text;
+            });
+        }
+
+        function greetSiteVoice() {
+            if (siteVoiceGreeted) return;
+            siteVoiceGreeted = true;
+            const text = 'הניווט הקולי פעיל. נושא מחזיר לבחירת הנושאים. פתח או הצג מציגים את הפריט. הבא וקדימה מתקדמים, קודם חוזר באותה רמה, ואחורה עולה רמה אחת.';
+            setMediaVoiceStatus(text);
+            speakMedia(text);
+        }
+
+        let siteCameraStream = null;
+        let cameraWatchId = 0;
+        let cameraGestureTimer = null;
+        let handLandmarker = null;
+        let lastCameraActionAt = 0;
+
+        function stopSiteCamera() {
+            cameraWatchId += 1;
+            if (cameraGestureTimer) {
+                cancelAnimationFrame(cameraGestureTimer);
+                clearTimeout(cameraGestureTimer);
+                cameraGestureTimer = null;
+            }
+            if (siteCameraStream) {
+                siteCameraStream.getTracks().forEach(track => track.stop());
+                siteCameraStream = null;
+            }
+            const video = document.getElementById('siteCameraPreview');
+            if (video) {
+                video.srcObject = null;
+                video.classList.remove('live');
+            }
+            const toggle = document.getElementById('siteCameraToggle');
+            if (toggle) {
+                toggle.textContent = '📷 הפעל מצלמה';
+                toggle.classList.remove('active');
+            }
+        }
+
+        const THUMB_ACTIONS = { left: 'הבא', right: 'הקודם', up: 'פתח', down: 'אחורה' };
+        const THUMB_LABELS = {
+            left: 'בוהן שמאלה: הבא',
+            right: 'בוהן ימינה: הקודם',
+            up: 'בוהן למעלה: פתח',
+            down: 'בוהן למטה: אחורה'
+        };
+
+        function runCameraAction(phrase, label) {
+            const now = Date.now();
+            if (voicePausedForSpeech || (siteVoiceAudio && !siteVoiceAudio.paused)) return false;
+            if (now - lastCameraActionAt < 900) return false;
+            lastCameraActionAt = now;
+            setMediaVoiceStatus(`מצלמה זיהתה ${label || phrase}`);
+            handleMediaVoice(phrase);
+            return true;
+        }
+
+        function thumbDirection(landmarks) {
+            const wrist = landmarks[0];
+            const base = landmarks[2];
+            const tip = landmarks[4];
+            const palm = Math.hypot(landmarks[9].x - wrist.x, landmarks[9].y - wrist.y) || 0.001;
+            const dx = base.x - tip.x;
+            const dy = tip.y - base.y;
+            const length = Math.hypot(dx, dy);
+            if (length < palm * 0.55) return '';
+            if (Math.abs(dx) >= Math.abs(dy) && Math.abs(dx) > palm * 0.35) return dx > 0 ? 'right' : 'left';
+            if (Math.abs(dy) > palm * 0.35) return dy < 0 ? 'up' : 'down';
+            return '';
+        }
+
+        function watchHandGestures(watchId) {
+            const video = document.getElementById('siteCameraPreview');
+            let direction = '';
+            let since = 0;
+            let locked = false;
+            const step = () => {
+                if (watchId !== cameraWatchId || !siteCameraStream) return;
+                if (handLandmarker && video && video.readyState >= 2) {
+                    let seen = null;
+                    try {
+                        seen = handLandmarker.detectForVideo(video, performance.now());
+                    } catch (err) {
+                        seen = null;
+                    }
+                    const landmarks = seen && seen.landmarks && seen.landmarks[0];
+                    const next = landmarks ? thumbDirection(landmarks) : '';
+                    const now = performance.now();
+                    if (!next) {
+                        direction = '';
+                        locked = false;
+                    } else if (next !== direction) {
+                        direction = next;
+                        since = now;
+                        locked = false;
+                        setMediaVoiceStatus(`רואה ${THUMB_LABELS[next]}`);
+                    } else if (!locked && now - since > 280) {
+                        if (runCameraAction(THUMB_ACTIONS[next], THUMB_LABELS[next])) locked = true;
+                    }
+                }
+                cameraGestureTimer = requestAnimationFrame(step);
+            };
+            cameraGestureTimer = requestAnimationFrame(step);
+        }
+
+        async function startCameraGestures(watchId) {
+            setMediaVoiceStatus('טוען זיהוי אגודל...');
+            try {
+                const vision = await import('https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@0.10.14');
+                if (watchId !== cameraWatchId) return;
+                const files = await vision.FilesetResolver.forVisionTasks('https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@0.10.14/wasm');
+                const model = 'https://storage.googleapis.com/mediapipe-models/hand_landmarker/hand_landmarker/float16/1/hand_landmarker.task';
+                const options = delegate => ({
+                    baseOptions: { modelAssetPath: model, delegate },
+                    runningMode: 'VIDEO',
+                    numHands: 1
+                });
+                try {
+                    handLandmarker = await vision.HandLandmarker.createFromOptions(files, options('GPU'));
+                } catch (err) {
+                    handLandmarker = await vision.HandLandmarker.createFromOptions(files, options('CPU'));
+                }
+                if (watchId !== cameraWatchId) return;
+                watchHandGestures(watchId);
+                const guide = 'אגודל שמאלה מתקדם, ימינה חוזר, למעלה פותח, למטה אחורה. החזיקו רגע.';
+                setMediaVoiceStatus(guide);
+                speakMedia(guide);
+            } catch (err) {
+                if (watchId === cameraWatchId) {
+                    setMediaVoiceStatus('זיהוי האגודל לא נטען. בדקו חיבור לרשת ופתחו את המצלמה שוב.');
+                }
+            }
+        }
+
+        async function toggleSiteCamera() {
+            if (siteCameraStream) {
+                stopSiteCamera();
+                setMediaVoiceStatus('המצלמה נסגרה.');
+                return;
+            }
+            if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+                setMediaVoiceStatus('הדפדפן הזה לא פותח מצלמה.');
+                return;
+            }
+            try {
+                const stream = await navigator.mediaDevices.getUserMedia({
+                    audio: false,
+                    video: { facingMode: 'user', width: { ideal: 640 }, height: { ideal: 480 } }
+                });
+                siteCameraStream = stream;
+                const video = document.getElementById('siteCameraPreview');
+                video.srcObject = stream;
+                await video.play();
+                video.classList.add('live');
+                const toggle = document.getElementById('siteCameraToggle');
+                if (toggle) {
+                    toggle.textContent = '📷 מצלמה פתוחה';
+                    toggle.classList.add('active');
+                }
+                setMediaVoiceStatus('המצלמה פתוחה. טוען זיהוי אגודל.');
+                startCameraGestures(cameraWatchId);
+            } catch (err) {
+                stopSiteCamera();
+                setMediaVoiceStatus('הדפדפן לא פתח את המצלמה. אשר את ההרשאה ולחץ שוב על הפעל מצלמה.');
+            }
+        }
+
+        function startSiteVoice(fromUser) {
+            const Recognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+            const toggle = document.getElementById('siteVoiceToggle');
+            if (!Recognition) {
+                setMediaVoiceStatus('הדפדפן הזה לא תומך בפקודות קול. אפשר להשתמש בכפתורים.');
+                return;
+            }
+            mediaVoiceWanted = true;
+            if (!mediaRecognition) {
+                const recognition = new Recognition();
+                mediaRecognition = recognition;
+                recognition.lang = 'he-IL';
+                recognition.continuous = false;
+                recognition.interimResults = false;
+                recognition.onresult = (event) => {
+                    const result = event.results[event.results.length - 1];
+                    const options = [];
+                    for (let i = 0; i < result.length; i += 1) options.push(result[i].transcript || '');
+                    const commandHit = options.find(text => matchVoiceCommand(normalizeVoice(text)));
+                    scheduleVoiceForget();
+                    handleMediaVoice(commandHit || options[0] || '');
+                };
+                recognition.onerror = (event) => {
+                    if (event.error === 'not-allowed' || event.error === 'service-not-allowed') {
+                        mediaVoiceWanted = false;
+                        if (toggle) toggle.textContent = '🎤 הפעל קול';
+                        setMediaVoiceStatus('לחץ על הפעל קול כדי לאפשר מיקרופון. אחר כך אפשר לנווט מהכניסה.');
+                        return;
+                    }
+                    queueVoiceRestart();
+                };
+                recognition.onend = () => queueVoiceRestart();
+            }
+            try {
+                mediaRecognition.start();
+                if (toggle) toggle.textContent = '🎤 מקשיב';
+                greetSiteVoice();
+            } catch (e) {
+                if (e && e.name === 'InvalidStateError') {
+                    if (toggle) toggle.textContent = '🎤 מקשיב';
+                    return;
+                }
+                if (fromUser) setMediaVoiceStatus('לא הצלחתי להפעיל את המיקרופון. נסה שוב.');
+            }
+        }
+
+        let voiceRestartTimer = null;
+        let voiceForgetTimer = null;
+
+        function queueVoiceRestart() {
+            if (!mediaVoiceWanted || !mediaRecognition || voicePausedForSpeech) return;
+            if (siteVoiceAudio && !siteVoiceAudio.paused) return;
+            clearTimeout(voiceRestartTimer);
+            voiceRestartTimer = setTimeout(() => {
+                try { mediaRecognition.start(); } catch (e) {}
+            }, 200);
+        }
+
+        function scheduleVoiceForget() {
+            clearTimeout(voiceForgetTimer);
+            voiceForgetTimer = setTimeout(() => {
+                setMediaVoiceStatus('מקשיב');
+                if (!mediaRecognition || !mediaVoiceWanted) return;
+                try { mediaRecognition.abort(); } catch (e) {}
+            }, 4000);
+        }
+
+        function startMediaVoice() {
+            startSiteVoice(true);
+        }
+
+        const VOICE_COMMANDS = [
+            ['help', ['עזרה', 'פקודות', 'help']],
+            ['up', ['אחורה', 'back', 'up']],
+            ['close', ['סגור', 'סגרי', 'סגירה', 'close']],
+            ['open', ['פתח', 'הצג', 'open', 'show']],
+            ['next', ['הבא', 'קדימה', 'אבא', 'אבה', 'הבה', 'הבאה', 'הבע', 'בא', 'בה', 'next', 'forward', 'נקסט', 'nekst']],
+            ['prev', ['קודם', 'הקודם', 'previous', 'prev']],
+            ['topics', ['נושא', 'נושאים', 'תחום', 'תחומים', 'הכל', 'topic', 'topics', 'subject', 'subjects']],
+            ['subtopics', ['תת נושא', 'תתי נושאים', 'תת נושאים']]
+        ];
+
+        function editDistance(left, right) {
+            const rows = Array.from({ length: left.length + 1 }, (_, index) => [index]);
+            for (let column = 0; column <= right.length; column += 1) rows[0][column] = column;
+            for (let i = 1; i <= left.length; i += 1) {
+                for (let j = 1; j <= right.length; j += 1) {
+                    rows[i][j] = left[i - 1] === right[j - 1]
+                        ? rows[i - 1][j - 1]
+                        : 1 + Math.min(rows[i - 1][j], rows[i][j - 1], rows[i - 1][j - 1]);
+                }
+            }
+            return rows[left.length][right.length];
+        }
+
+        function tokenIsNext(token) {
+            if (!token) return false;
+            if (['הבא', 'קדימה', 'אבא', 'אבה', 'הבה', 'הבאה', 'הבע', 'next', 'forward', 'נקסט', 'nekst'].includes(token)) return true;
+            if (token.length < 3 || token.length > 8) return false;
+            return ['הבא', 'אבא', 'קדימה', 'next'].some(word => editDistance(token, word) <= 1);
+        }
+
+        function matchVoiceCommand(phrase) {
+            const tokens = String(phrase || '').split(' ').filter(Boolean);
+            for (let i = tokens.length - 1; i >= 0; i -= 1) {
+                const pair = i > 0 ? `${tokens[i - 1]} ${tokens[i]}` : '';
+                if (tokenIsNext(tokens[i]) || pair === 'ה בא' || pair === 'א בא' || pair === 'ה בע') return 'next';
+                for (const [id, words] of VOICE_COMMANDS) {
+                    if (id === 'next') continue;
+                    if (words.includes(tokens[i]) || (pair && words.includes(pair))) return id;
+                }
+            }
+            return '';
+        }
+
+        let voiceOptionsOnly = false;
+        let voicePendingChoice = null;
+        let voiceBrowsingItems = false;
+
+        function markVoiceBrowsing(recordId) {
+            voiceBrowsingItems = true;
+            if (recordId == null) return;
+            const index = currentRecords.findIndex(record => String(record.id) === String(recordId));
+            if (index >= 0) voiceRecordIndex = index;
+        }
+
+        function settleVoiceList() {
+            if (voiceListReset || voiceRecordIndex >= currentRecords.length) voiceRecordIndex = 0;
+            voiceListReset = false;
+            const hold = voiceOptionsOnly;
+            voiceOptionsOnly = false;
+            if (hold) {
+                document.querySelectorAll('.record-card.voice-current').forEach(card => card.classList.remove('voice-current'));
+                if (mediaStageOpen) closeMediaStage(true);
+            } else {
+                highlightVoiceRecord(false);
+                if (mediaStageOpen) renderMediaStage();
+            }
+            renderVoiceChoices();
+        }
+
+        function openMediaStage(index) {
+            mediaStageOpen = true;
+            mediaStageReset = false;
+            mediaStageIndex = Number.isInteger(index) ? index : 0;
+            const stage = document.getElementById('mediaStage');
+            stage.classList.add('open');
+            renderMediaStage();
+            const shown = buildMediaPlaylist()[mediaStageIndex];
+            if (shown) markVoiceBrowsing(shown.recordId);
+            else voiceBrowsingItems = true;
+            if (document.fullscreenElement && document.exitFullscreen) document.exitFullscreen().catch(() => {});
+            startMediaVoice();
+        }
+
+        function openMediaStageFor(recordId, kind, encodedUrl) {
+            const url = encodedUrl ? decodeURIComponent(encodedUrl) : '';
+            const items = buildMediaPlaylist();
+            let index = items.findIndex(item => item.recordId === String(recordId) && item.kind === kind && (!url || item.url === url));
+            if (index < 0) index = items.findIndex(item => item.recordId === String(recordId) && item.kind === kind);
+            openMediaStage(Math.max(index, 0));
+        }
+
+        function closeMediaStage(silent) {
+            if (!mediaStageOpen && !document.getElementById('mediaStage').classList.contains('open')) return;
+            mediaStageOpen = false;
+            document.getElementById('mediaStage').classList.remove('open');
+            document.getElementById('mediaStageFrame').innerHTML = '';
+            highlightVoiceRecord(true);
+            if (!silent) {
+                setMediaVoiceStatus('חזרה לרשימה. אפשר לומר הבא, קדימה, פתח או הצג.');
+                speakMedia('חזרה לרשימה');
+            }
+            if (document.fullscreenElement) document.exitFullscreen().catch(() => {});
+        }
+
+        function stepMediaStage(delta) {
+            const items = buildMediaPlaylist();
+            if (!items.length) return;
+            mediaStageIndex = (mediaStageIndex + delta + items.length) % items.length;
+            renderMediaStage();
+        }
+
+        function syncDomainTabs(domain) {
+            document.querySelectorAll('.domain-tabs .tab-btn').forEach(btn => {
+                const action = btn.getAttribute('onclick') || '';
+                const active = domain === 'all'
+                    ? action.includes("filterDomain('all'")
+                    : action.includes(`filterDomain('${domain}'`);
+                btn.classList.toggle('active', active);
+            });
+        }
+
+        async function chooseMediaDomain(domainKey) {
+            currentDomain = domainKey;
+            currentSubTopic = 'all';
+            mediaStageReset = true;
+            voiceListReset = true;
+            voiceOptionsOnly = true;
+            voiceBrowsingItems = false;
+            if (mediaStageOpen) closeMediaStage(true);
+            syncDomainTabs(domainKey);
+            renderSubTopicFilterBar();
+            const info = domainConfig[domainKey] || {};
+            const names = Object.values(info.sub_topics || {}).map(item => item.label_he).filter(Boolean);
+            const label = domainKey === 'all' ? 'התחומים' : (info.label_he || domainKey);
+            if (domainKey === 'all') {
+                const domainNames = Object.values(domainConfig || {}).map(item => item.label_he).filter(Boolean);
+                setMediaVoiceStatus(`תחומים: ${domainNames.join(', ')}`);
+                speakMedia(domainNames.length ? `התחומים: ${domainNames.join(', ')}. אמור את שם התחום.` : 'אין תחומים');
+            } else {
+                setMediaVoiceStatus(names.length ? `${label}. אמור תת נושא: ${names.join(', ')}` : label);
+                speakMedia(names.length ? `${label}. תתי הנושאים: ${names.join(', ')}` : label);
+            }
+            await fetchRecords();
+        }
+
+        async function chooseMediaSubTopic(subKey) {
+            currentSubTopic = subKey;
+            mediaStageReset = true;
+            voiceListReset = true;
+            voiceBrowsingItems = true;
+            renderSubTopicFilterBar();
+            const label = subTopicLabelsMap[subKey] || subKey;
+            setMediaVoiceStatus(label);
+            speakMedia(label);
+            await fetchRecords();
+        }
+
+        const DOMAIN_SPOKEN = {
+            health: ['בריאות', 'בריאותי'],
+            culinary: ['קולינריה', 'בישול'],
+            diet: ['דיאטה', 'תזונה'],
+            garden: ['גינון', 'גינה'],
+            foraging: ['ליקוט'],
+            mental: ['מנטלי', 'נפש'],
+            financial: ['כלכלי', 'כלכלה', 'פיננסי'],
+            exercise: ['אימון', 'אימונים', 'כושר'],
+            AI: ['בינה מלאכותית', 'איי איי']
+        };
+
+        function cleanVoiceCommand(phrase) {
+            return phrase
+                .replace(/^(בבקשה|אנא|תחום|נושא|לך ל|עבור ל|פתח|תת נושא)\s+/, '')
+                .replace(/\s+(בבקשה|אנא)$/, '')
+                .trim();
+        }
+
+        function foldHebrew(text) {
+            return normalizeVoice(text)
+                .replace(/ך/g, 'כ')
+                .replace(/ם/g, 'מ')
+                .replace(/ן/g, 'נ')
+                .replace(/ף/g, 'פ')
+                .replace(/ץ/g, 'צ');
+        }
+
+        function firstLabelWord(label) {
+            const words = foldHebrew(label).split(' ').filter(Boolean);
+            if (words[0] && words[0].length === 1 && words[1]) return words[0] + words[1];
+            return words[0] || '';
+        }
+
+        function wordStartsName(spokenWord, label) {
+            const spoken = foldHebrew(spokenWord);
+            const first = firstLabelWord(label);
+            if (!spoken || !first) return false;
+            if (spoken === first) return true;
+            if (spoken.length < 3 || first.length < 3) return false;
+            if (first.startsWith(spoken) && spoken.length >= first.length - 2) return true;
+            return spoken.startsWith(first);
+        }
+
+        function collectTopicMatches(phrase) {
+            const spoken = cleanVoiceCommand(phrase);
+            const token = foldHebrew((spoken.split(' ').filter(Boolean)[0]) || '');
+            if (!token || token === 'תחום' || token === 'נושא') return [];
+            const found = [];
+            const seen = new Set();
+            for (const [key, info] of Object.entries(domainConfig || {})) {
+                if (key === 'general' || !info) continue;
+                const domainNames = [info.label_he, info.label_en, key, ...(DOMAIN_SPOKEN[key] || [])];
+                if (domainNames.some(name => wordStartsName(token, name))) {
+                    const id = `domain:${key}`;
+                    if (!seen.has(id)) {
+                        seen.add(id);
+                        found.push({ kind: 'domain', key, label: info.label_he || key });
+                    }
+                }
+                for (const [subKey, sub] of Object.entries(info.sub_topics || {})) {
+                    if (![sub.label_he, subKey].some(name => wordStartsName(token, name))) continue;
+                    const id = `sub:${key}:${subKey}`;
+                    if (seen.has(id)) continue;
+                    seen.add(id);
+                    found.push({ kind: 'sub', domainKey: key, key: subKey, label: sub.label_he || subKey });
+                }
+            }
+            return found;
+        }
+
+        function choicesAreOpen() {
+            if (mediaStageOpen) return false;
+            if (currentDomain === 'all') return true;
+            const subs = Object.keys((domainConfig[currentDomain] || {}).sub_topics || {});
+            return currentSubTopic === 'all' && subs.length > 0;
+        }
+
+        function speakOpenChoices() {
+            if (currentDomain === 'all') {
+                const names = Object.values(domainConfig || {}).filter(item => item.label_he && item.label_he !== 'כללי').map(item => item.label_he);
+                const text = names.length ? `בחר נושא: ${names.join(', ')}` : 'אמור שם של נושא';
+                setMediaVoiceStatus(text);
+                speakMedia(text);
+                return;
+            }
+            const names = Object.values((domainConfig[currentDomain] || {}).sub_topics || {}).map(item => item.label_he).filter(Boolean);
+            const text = names.length ? `בחר תת נושא: ${names.join(', ')}` : 'אמור שם של פריט';
+            setMediaVoiceStatus(text);
+            speakMedia(text);
+        }
+
+        function spokenWords(phrase) {
+            return foldHebrew(cleanVoiceCommand(phrase)).split(' ').filter(Boolean);
+        }
+
+        function preferShortestName(phrase, matches) {
+            const words = spokenWords(phrase);
+            if (words.length !== 1 || matches.length < 2) return matches;
+            const word = words[0];
+            const exact = matches.filter(match => foldHebrew(match.label) === word);
+            if (exact.length) return exact;
+            const single = matches.filter(match => {
+                const labelWords = foldHebrew(match.label).split(' ').filter(Boolean);
+                return labelWords.length === 1 && labelWords[0] === word;
+            });
+            if (single.length) return single;
+            return matches;
+        }
+
+        function wordsAlign(spoken, labelWord) {
+            if (!spoken || !labelWord) return false;
+            if (spoken === labelWord) return true;
+            if (spoken.length < 3 || labelWord.length < 3) return false;
+            if (labelWord.startsWith(spoken) && spoken.length >= labelWord.length - 2) return true;
+            return spoken.startsWith(labelWord) && labelWord.length >= spoken.length - 2;
+        }
+
+        function labelCoversWords(label, words) {
+            const labelWords = foldHebrew(label).split(' ').filter(Boolean);
+            let cursor = 0;
+            for (const word of words) {
+                let found = -1;
+                for (let index = cursor; index < labelWords.length; index += 1) {
+                    if (wordsAlign(word, labelWords[index])) {
+                        found = index;
+                        break;
+                    }
+                }
+                if (found < 0) return false;
+                cursor = found + 1;
+            }
+            return true;
+        }
+
+        function preferSpokenPhrase(phrase, matches) {
+            const words = spokenWords(phrase);
+            if (matches.length < 2) return matches;
+            if (words.length > 1) {
+                const covered = matches.filter(match => labelCoversWords(match.label, words));
+                if (covered.length) return covered;
+            }
+            return preferShortestName(phrase, matches);
+        }
+
+        function matchOrdinal(said) {
+            const tokens = foldHebrew(said).split(' ').filter(Boolean);
+            const first = ['הראשון', 'ראשון', 'הראשונה', 'ראשונה', 'אחת', '1', 'first'].map(foldHebrew);
+            const second = ['השני', 'שני', 'השניה', 'השנייה', 'שניה', 'שנייה', 'שתיים', '2', 'second'].map(foldHebrew);
+            if (tokens.some(token => first.includes(token))) return 1;
+            if (tokens.some(token => second.includes(token))) return 2;
+            return 0;
+        }
+
+        function choiceMatchesReply(match, said) {
+            const words = spokenWords(said);
+            if (!words.length) return false;
+            if (words.length > 1) return labelCoversWords(match.label, words);
+            const labelWords = foldHebrew(match.label).split(' ').filter(Boolean);
+            return labelWords[0] === words[0];
+        }
+
+        async function applyTopicMatch(match) {
+            voicePendingChoice = null;
+            if (!match) return;
+            if (match.kind === 'record') {
+                voiceRecordIndex = match.index;
+                highlightVoiceRecord(true);
+                openFocusedRecord();
+                return;
+            }
+            if (match.kind === 'domain') {
+                await chooseMediaDomain(match.key);
+                return;
+            }
+            if (currentDomain !== match.domainKey) {
+                currentDomain = match.domainKey;
+                syncDomainTabs(match.domainKey);
+                renderSubTopicFilterBar();
+            }
+            await chooseMediaSubTopic(match.key);
+        }
+
+        function askTopicChoice(matches) {
+            voicePendingChoice = matches.slice(0, 2);
+            const [first, second] = voicePendingChoice;
+            const text = `התכוונת ל${first.label}, או ל${second.label}? אמור הראשון או השני.`;
+            setMediaVoiceStatus(text);
+            speakMedia(text);
+        }
+
+        async function goUpVoiceLevel() {
+            if (mediaStageOpen) {
+                closeMediaStage();
+                return;
+            }
+            if (document.getElementById('detailModal')?.classList.contains('active')) {
+                closeModal();
+                setMediaVoiceStatus('חזרה לרשימה');
+                speakMedia('חזרה לרשימה');
+                return;
+            }
+            if (document.getElementById('editModal')?.classList.contains('active')) {
+                closeEditModal();
+                setMediaVoiceStatus('חזרה לרשימה');
+                speakMedia('חזרה לרשימה');
+                return;
+            }
+            if (currentSubTopic !== 'all') {
+                await chooseMediaDomain(currentDomain);
+                return;
+            }
+            if (currentDomain !== 'all') {
+                await chooseMediaDomain('all');
+                return;
+            }
+            setMediaVoiceStatus('כבר בבחירת הנושאים. אמור שם של נושא.');
+            speakMedia('כבר בבחירת הנושאים. אמור שם של נושא.');
+        }
+
+        function collectRecordMatches(phrase) {
+            const spoken = cleanVoiceCommand(phrase);
+            if (spoken.length < 2) return [];
+            const hits = [];
+            currentRecords.forEach((record, index) => {
+                const title = normalizeVoice(record.title || '');
+                if (title.startsWith(spoken)) hits.push({ kind: 'record', index, label: record.title || spoken });
+            });
+            return hits;
+        }
+
+        async function openRecordByNameStart(phrase) {
+            const hits = preferSpokenPhrase(phrase, collectRecordMatches(phrase));
+            if (hits.length === 1) {
+                await applyTopicMatch(hits[0]);
+                return true;
+            }
+            if (hits.length > 1) {
+                askTopicChoice(hits);
+                return true;
+            }
+            return false;
+        }
+
+        async function handleMediaVoice(transcript) {
+            if (voicePausedForSpeech || (siteVoiceAudio && !siteVoiceAudio.paused)) return;
+            const phrase = normalizeVoice(transcript);
+            if (!phrase) return;
+            const said = phrase.replace(/^(please|בבקשה|אנא)\s+/, '').replace(/\s+(please|בבקשה|אנא)$/, '');
+            const command = matchVoiceCommand(said);
+            if (voicePendingChoice && !command) {
+                const ordinal = matchOrdinal(said);
+                if (ordinal === 1 || ordinal === 2) {
+                    await applyTopicMatch(voicePendingChoice[ordinal - 1]);
+                    return;
+                }
+                const picked = preferSpokenPhrase(said, voicePendingChoice.filter(match => choiceMatchesReply(match, said)));
+                if (picked.length === 1) {
+                    await applyTopicMatch(picked[0]);
+                    return;
+                }
+                if (picked.length > 1) {
+                    askTopicChoice(voicePendingChoice);
+                    return;
+                }
+                voicePendingChoice = null;
+            }
+            if (voicePendingChoice && command && command !== 'help') voicePendingChoice = null;
+            const announcing = siteVoiceAudio && !siteVoiceAudio.paused;
+            if (announcing && (command === 'next' || command === 'prev') && !voiceBrowsingItems && choicesAreOpen()) return;
+            if (announcing && !command && !said.startsWith('open ') && !said.startsWith('פתח ')) return;
+            stopSpokenAudio();
+            setMediaVoiceStatus(`שמעתי: ${transcript}`);
+            scheduleVoiceForget();
+            if (command === 'help') {
+                const help = 'אפשר לומר next או הבא, previous או קודם, back או אחורה, open או פתח, show או הצג, topic או נושא.';
+                setMediaVoiceStatus(help);
+                speakMedia(help);
+                return;
+            }
+            if (command === 'up') {
+                await goUpVoiceLevel();
+                return;
+            }
+            if (command === 'close') {
+                if (mediaStageOpen) closeMediaStage();
+                else if (document.getElementById('detailModal')?.classList.contains('active')) closeModal();
+                else if (document.getElementById('editModal')?.classList.contains('active')) closeEditModal();
+                else await goUpVoiceLevel();
+                return;
+            }
+            if (/^(?:פתח|open|show)\s+\S/.test(said)) {
+                if (openRecordByNameStart(said.replace(/^(?:פתח|open|show)\s+/, ''))) return;
+            }
+            if (command === 'open') {
+                openFocusedRecord();
+                return;
+            }
+            if (command === 'next' || command === 'prev') {
+                if (!voiceBrowsingItems && choicesAreOpen()) {
+                    speakOpenChoices();
+                    return;
+                }
+                advanceVoice(command === 'next' ? 1 : -1);
+                return;
+            }
+            if (command === 'topics') {
+                if (mediaStageOpen) closeMediaStage(true);
+                await chooseMediaDomain('all');
+                return;
+            }
+            if (command === 'subtopics') {
+                const names = Object.values((domainConfig[currentDomain] || {}).sub_topics || {}).map(item => item.label_he).filter(Boolean);
+                if (currentDomain === 'all' || !names.length) {
+                    setMediaVoiceStatus('קודם אמור תחום.');
+                    speakMedia('קודם אמור תחום.');
+                } else {
+                    setMediaVoiceStatus(`תתי נושאים: ${names.join(', ')}`);
+                    speakMedia(`תתי הנושאים: ${names.join(', ')}`);
+                    renderMediaTopics();
+                }
+                return;
+            }
+            const topicMatches = preferSpokenPhrase(phrase, collectTopicMatches(phrase));
+            if (topicMatches.length === 1) {
+                await applyTopicMatch(topicMatches[0]);
+                return;
+            }
+            if (topicMatches.length > 1) {
+                askTopicChoice(topicMatches);
+                return;
+            }
+            if (openRecordByNameStart(phrase)) return;
+            setMediaVoiceStatus(`לא זיהיתי פקודה: ${transcript}`);
+        }
+
+        document.addEventListener('keydown', (event) => {
+            if (!mediaStageOpen) return;
+            if (event.key === 'Escape') {
+                event.preventDefault();
+                event.stopImmediatePropagation();
+                closeMediaStage();
+            } else if (event.key === 'ArrowLeft') {
+                event.preventDefault();
+                event.stopImmediatePropagation();
+                stepMediaStage(1);
+            } else if (event.key === 'ArrowRight') {
+                event.preventDefault();
+                event.stopImmediatePropagation();
+                stepMediaStage(-1);
+            }
+        });
+        document.addEventListener('fullscreenchange', () => {
+            if (!document.fullscreenElement && mediaStageOpen) closeMediaStage();
+        });
 
         function toggleInlineCollapsible(id) {
             const el = document.getElementById(`collab-${id}`);
@@ -1576,6 +2739,7 @@
         function openDetailModal(id) {
             const r = currentRecords.find(item => String(item.id) === String(id));
             if (!r) return;
+            markVoiceBrowsing(id);
 
             const keywords = safeParse(r.keywords_json, []);
             const customTags = safeParse(r.custom_tags_json, []);
@@ -2159,7 +3323,7 @@
         }
 
         document.addEventListener('keydown', (event) => {
-            if (!cookPilotKeyboardEnabled || event.target.matches('input, textarea, select')) return;
+            if (mediaStageOpen || !cookPilotKeyboardEnabled || !cookPilotLastPlan || event.target.matches('input, textarea, select')) return;
             if (event.key === 'ArrowRight') sendCookPilotCommand('next');
             if (event.key === 'ArrowLeft') sendCookPilotCommand('back');
             if (event.key.toLowerCase() === 'r') sendCookPilotCommand('repeat');

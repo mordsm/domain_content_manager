@@ -855,10 +855,10 @@
     </div>
 
     <div id="siteVoice">
-        <button type="button" id="siteVoiceToggle" onclick="startSiteVoice(true)">🎤 הפעל קול</button>
+        <button type="button" id="siteVoiceToggle" onclick="toggleSiteVoice()">🎤 הפעל קול</button>
         <button type="button" id="siteCameraToggle" onclick="toggleSiteCamera()">📷 הפעל מצלמה</button>
         <video id="siteCameraPreview" autoplay playsinline muted></video>
-        <span id="siteVoiceStatus">הקול מנווט מהכניסה: תחום, תת-נושא, הבא, הקודם, פתח, סגור</span>
+        <span id="siteVoiceStatus">לחץ על "🎤 הפעל קול" לניווט קולי (הבא, הקודם, פתח, סגור)</span>
         <div id="siteVoiceTopics"></div>
     </div>
 
@@ -1221,11 +1221,9 @@
                 injectDynamicBadgeCSS();
                 checkSharedUrlParams();
                 await fetchRecords();
-                startSiteVoice(false);
             } catch (err) {
                 console.error("Failed to load domain config from YAML:", err);
                 await fetchRecords();
-                startSiteVoice(false);
             }
         }
 
@@ -1911,8 +1909,10 @@
         function cleanSpokenText(text) {
             return String(text || '')
                 .replace(/אינפוגרפיקה:\s*/g, '')
+                .replace(/https?:\/\/\S+/gi, 'קישור')
                 .replace(/\.(png|jpe?g|webp|gif|mp4|webm)/gi, '')
                 .replace(/\(\s*\d+\s*קבצים\s*\)/g, '')
+                .replace(/[\u{1F300}-\u{1FAFF}\u{2600}-\u{27BF}]/gu, ' ')
                 .replace(/[_/]+/g, ' ')
                 .replace(/\s+/g, ' ')
                 .trim();
@@ -2144,6 +2144,30 @@
             }
         }
 
+        function stopSiteVoice() {
+            mediaVoiceWanted = false;
+            voicePausedForSpeech = false;
+            clearTimeout(voiceRestartTimer);
+            clearTimeout(voiceForgetTimer);
+            stopSpokenAudio();
+            if (mediaRecognition) {
+                try { mediaRecognition.abort(); } catch (e) {
+                    try { mediaRecognition.stop(); } catch (err) {}
+                }
+            }
+            const toggle = document.getElementById('siteVoiceToggle');
+            if (toggle) toggle.textContent = '🎤 הפעל קול';
+            setMediaVoiceStatus('הקול כבוי. לחץ על הפעל קול להפעלה.');
+        }
+
+        function toggleSiteVoice() {
+            if (mediaVoiceWanted) {
+                stopSiteVoice();
+            } else {
+                startSiteVoice(true);
+            }
+        }
+
         function startSiteVoice(fromUser) {
             const Recognition = window.SpeechRecognition || window.webkitSpeechRecognition;
             const toggle = document.getElementById('siteVoiceToggle');
@@ -2159,6 +2183,7 @@
                 recognition.continuous = false;
                 recognition.interimResults = false;
                 recognition.onresult = (event) => {
+                    if (voicePausedForSpeech || (siteVoiceAudio && !siteVoiceAudio.paused)) return;
                     const result = event.results[event.results.length - 1];
                     const options = [];
                     for (let i = 0; i < result.length; i += 1) options.push(result[i].transcript || '');
@@ -2179,11 +2204,11 @@
             }
             try {
                 mediaRecognition.start();
-                if (toggle) toggle.textContent = '🎤 מקשיב';
-                greetSiteVoice();
+                if (toggle) toggle.textContent = '🔇 כבה קול (מקשיב)';
+                if (fromUser) greetSiteVoice();
             } catch (e) {
                 if (e && e.name === 'InvalidStateError') {
-                    if (toggle) toggle.textContent = '🎤 מקשיב';
+                    if (toggle) toggle.textContent = '🔇 כבה קול (מקשיב)';
                     return;
                 }
                 if (fromUser) setMediaVoiceStatus('לא הצלחתי להפעיל את המיקרופון. נסה שוב.');
@@ -2293,10 +2318,9 @@
             stage.classList.add('open');
             renderMediaStage();
             const shown = buildMediaPlaylist()[mediaStageIndex];
-            if (shown) markVoiceBrowsing(shown.recordId);
+            if ( shown) markVoiceBrowsing(shown.recordId);
             else voiceBrowsingItems = true;
             if (document.fullscreenElement && document.exitFullscreen) document.exitFullscreen().catch(() => {});
-            startMediaVoice();
         }
 
         function openMediaStageFor(recordId, kind, encodedUrl) {
